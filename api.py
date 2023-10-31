@@ -22,21 +22,6 @@ def authenticate():
     print("Autenticado")
     return True
 
-# Atualizar linha -> Fazer ainda
-@app.route('/update_line', methods=['POST'])
-def receber_json():
-    if not authenticate():
-        return abort(401)
-
-    try:
-        dados_json = request.get_json()
-        print("Recebendo JSON \nInvocando DB")
-        fine(dados_json)  # Invocando integração OPENAI
-        return jsonify({"mensagem": "JSON recebido com sucesso", "dados": dados_json}), 200
-
-    except Exception as e:
-        return jsonify({"erro": "Erro ao processar JSON", "mensagem": str(e)}), 400
-    
 
 
 # Função enviar todo o banco de dados
@@ -47,7 +32,7 @@ def enviar_db():
 
     try:
         # Conecte-se ao banco de dados SQLite 
-        conn = sqlite3.connect('clientes.db')
+        conn = sqlite3.connect('openaai.db')
         cursor = conn.cursor()
 
         # Execute uma consulta para obter os dados do banco de dados (substitua com sua própria consulta)
@@ -77,10 +62,7 @@ def enviar_db():
     except Exception as e:
         return jsonify({"erro": "Erro ao processar dados do banco de dados", "mensagem": str(e)}), 400
 
-
-
 # Passar query
-
 @app.route('/query', methods=['POST'])
 def recebe_query(): 
     try:
@@ -90,7 +72,7 @@ def recebe_query():
         print(f'Query = {query}')
         
         # Conecte-se ao banco de dados SQLite 
-        conn = sqlite3.connect('clientes.db')
+        conn = sqlite3.connect('openaai.db')
         cursor = conn.cursor()
         
         # Execute a consulta SQL
@@ -116,18 +98,14 @@ def recebe_query():
 
 
 
-
-
-
 # Função criar 
-
 @app.route('/create_db',methods=['POST'] )
-
 def criar_db():
-    if not authenticate():
-        return abort(401)
+    """if not authenticate():
+        return abort(401)"""
     try:
-        db.verifica()
+        db.criar_db_sqlite()
+        db.criar_login()
         return jsonify({"mensagem": "Banco de dados Criado com Sucesso"}), 200
 
     except Exception as e:
@@ -136,12 +114,199 @@ def criar_db():
 
 
 
+# Cadastrar novo contato
+@app.route('/novo_contato', methods=['POST'])
+def novo_contato():
+    try:
+        # Recebe os dados JSON da solicitação POST
+        dados = request.get_json()
+        print(f"Dados = {dados}")
 
+        # Extrai os campos necessários do JSON
+        id = dados['id']
+        nome = dados['nome']
+        numero = dados['numero']
+        codClient = dados['codClient']
+        ConfirmouWP = dados['ConfirmouWP']
+        ConfirmaEnvio = dados['ConfirmaEnvio']
+        enviar = dados['enviar']
+
+        # Conecta-se ao banco de dados
+        conn = sqlite3.connect('openaai.db')
+        cursor = conn.cursor()
+
+        # Executa a query SQL para inserir um novo cliente na tabela
+        query = "INSERT INTO clientes (id, nome, numero, codClient, ConfirmouWP, ConfirmaEnvio, enviar) VALUES (?, ?, ?, ?, ?, ?, ?)"
+        cursor.execute(query, (id, nome, numero, codClient, ConfirmouWP, ConfirmaEnvio, enviar))
+
+        # Comita a transação e fecha a conexão com o banco de dados
+        conn.commit()
+        conn.close()
+
+        # Retorna uma resposta de sucesso
+        return jsonify({'message': 'Cliente adicionado com sucesso'}), 201
+
+    except Exception as e:
+        # Em caso de erro, retorna uma resposta de erro
+        return jsonify({'error': str(e)}), 400
+
+
+
+
+# Remover pelo ID
+@app.route('/remove_registro', methods=['POST'])
+def remove_registro():
+    try:
+        dados = request.get_data(as_text=True)
+        print(f'Remover = {dados}\nTipo de dado = {type(dados)}')
+        conn = sqlite3.connect('openaai.db')
+        cursor = conn.cursor()
+        query = f"DELETE FROM clientes WHERE id = {dados}"
+        # Execute a consulta SQL
+        cursor.execute(query)
+        conn.commit()
+        conn.close()
+        
+        # Retorna uma resposta de sucesso
+        return jsonify({'message': 'Cliente removido com sucesso'}), 201
+    except Exception as e:
+        # Em caso de erro, retorna uma resposta de erro
+        return jsonify({'error': str(e)}), 400
+
+
+
+
+# Update pelo ID
+
+@app.route('/update', methods = ['POST'])
+def update_id():
+    try:
+        dados = request.get_data(as_text=True)
+        print(f'Remover = {dados}\nTipo de dado = {type(dados)}')
+        conn = sqlite3.connect('openaai.db')
+        cursor = conn.cursor()
+        query = "UPDATE clientes SET nome = ?, numero = ?, ConfirmouWP = ?, ConfirmaEnvio = ? WHERE id = ?"
+        # Execute a consulta SQL
+        cursor.execute(query,(dados['nome'], dados['numero'], dados['ConfirmouWP'], dados['ConfirmaEnvio'], dados['id']))
+        conn.commit()
+        conn.close()
+        
+        # Retorna uma resposta de sucesso
+        return jsonify({'message': 'Cliente atualizado com sucesso'}), 201
+    except Exception as e:
+        # Em caso de erro, retorna uma resposta de erro
+        return jsonify({'error': str(e)}), 400
+
+
+
+
+
+
+# Update confirma envio = Nao
+@app.route('/confirma_envio', methods = ['POST'])
+def confirma_envio():
+    try:
+        conn = sqlite3.connect('openaai.db')
+        cursor = conn.cursor()
+        query = "UPDATE Clientes SET ConfirmaEnvio = 'nao' WHERE ConfirmaEnvio = 'sim'"
+        # Execute a consulta SQL
+        cursor.execute(query)
+        conn.commit()
+        conn.close()
+        
+        # Retorna uma resposta de sucesso
+        return jsonify({'message': 'Clientes atualizados com sucesso'}), 201
+    except Exception as e:
+        # Em caso de erro, retorna uma resposta de erro
+        return jsonify({'error': str(e)}), 400
+
+
+
+
+
+
+
+# Deleta TODOS os clientes
+@app.route('/delete_clientes', methods = ['POST'])
+def delete_clientes():
+    try:
+        conn = sqlite3.connect('openaai.db')
+        cursor = conn.cursor()
+        query = "DELETE FROM Clientes"
+        # Execute a consulta SQL
+        cursor.execute(query)
+        conn.commit()
+        conn.close()
+        
+        # Retorna uma resposta de sucesso
+        return jsonify({'message': 'Clientes deletados com sucesso'}), 201
+    except Exception as e:
+        # Em caso de erro, retorna uma resposta de erro
+        return jsonify({'error': str(e)}), 400
+
+
+
+
+# Contar todos os clientes
+@app.route('/contar_clientes', methods = ['GET'])
+def contar_clientes():
+    try:
+        # Conecte-se ao banco de dados SQLite 
+        conn = sqlite3.connect('openaai.db')
+        cursor = conn.cursor()
+
+        # Execute uma consulta para obter os dados do banco de dados (substitua com sua própria consulta)
+        cursor.execute("SELECT COUNT(*) FROM Clientes")
+        # Recupere o valor do contador
+        contador = cursor.fetchone()[0]
+
+        # Feche a conexão com o banco de dados
+        conn.close()
+
+        # Envie os dados como resposta em formato JSON
+        return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
+
+
+    except Exception as e:
+        return jsonify({"erro": "Erro ao contar clientes", "mensagem": str(e)}), 400
+
+
+
+# Retornar primeiro cliente com ConfirmaEnvio = não
+@app.route('/confirmaEqualNao', methods = ['GET'])
+def confirmaEqualNao():
+    try:
+        # Conecte-se ao banco de dados SQLite 
+        conn = sqlite3.connect('openaai.db')
+        cursor = conn.cursor()
+
+        # Execute uma consulta para obter os dados do banco de dados (substitua com sua própria consulta)
+        cursor.execute("SELECT * FROM Clientes WHERE ConfirmaEnvio = 'nao' ORDER BY id DESC LIMIT 1")
+        # Recupere o valor do contador
+        registro = cursor.fetchone()
+
+        # Feche a conexão com o banco de dados
+        conn.close()
+
+        # Envie os dados como resposta em formato JSON
+        if registro is None:
+            return jsonify({"mensagem": "Nenhum cliente encontrado!", "registro": registro}), 200
+
+        return jsonify({"mensagem": "Contagem de registros", "registro": registro}), 200
+
+
+    except Exception as e:
+        return jsonify({"erro": "Erro ao contar clientes", "mensagem": str(e)}), 400
+
+
+
+
+# Conferir API online
 
 @app.route('/', methods=['GET'])
 def enviar_status():
     try:
-        return jsonify({"mensagem": "API online.", "GPT": "Status fine - OK"}), 200
+        return jsonify({"mensagem": "API online.", "GPT": "Status - OK"}), 200
     except Exception as e:
         return jsonify({"erro": "Erro ao acessar dados"}), 400
 
