@@ -4,21 +4,27 @@
 
 Este projeto consiste em uma API criada com o Flask que permite gerenciar dados de clientes em um banco de dados SQLite. A API oferece várias funcionalidades, como adicionar novos clientes, consultar dados do banco de dados, atualizar informações de clientes e muito mais.
 
+## Primeira execução
+
+Para primeira execução, não esqueça de utilizar o endpoint /create_db para criar o banco de dados SQLITE
+
 ## Requisitos
 
 - Python 3.x
 - Flask
-- Outras bibliotecas (listadas em requirements.txt)
+- SQLITE 3
+
+Todas as bibliotecas externas serão acrescentadas também ao requirements.txt
 
 ## Instalação
 
 1. Clone o repositório:
 
-   git clone https://github.com/seurepositorio/seuprojeto.git
+   git clone https://github.com/L0tus-Program/API_base_uso_Ronaldo
 
 2. Navegue até o diretório do projeto:
 
-   cd seuprojeto
+   cd API_base_uso_Ronaldo
 
 3. Crie um ambiente virtual (opcional, mas recomendado):
 
