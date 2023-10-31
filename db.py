@@ -1,7 +1,8 @@
 import pandas as pd
 from datetime import datetime, timedelta
 import sqlite3
-import os # Verificar se o BD existe na pasta de arquivos
+
+
 
 
 
