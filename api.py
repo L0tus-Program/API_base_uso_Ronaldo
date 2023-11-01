@@ -1,9 +1,15 @@
 from flask import Flask, request, jsonify, abort
 import db
 import sqlite3
-"""
-# Chave apenas temporaria
-API_KEY = 'Messem@2023'"""
+import json 
+
+# Abra o arquivo JSON
+with open('src.json', 'r') as file:
+    src = json.load(file)
+
+
+# key API
+API_KEY = str(src['key'])
 
 # Outras configurações do aplicativo
 DEBUG = True
@@ -17,18 +23,19 @@ app = Flask(__name__)
 # Autenticação
 def authenticate():
     api_key = request.headers.get('X-API-KEY')
-    """if api_key != API_KEY:
-        return abort(401)"""
+    if api_key != API_KEY:
+        return abort(401)
     print("Autenticado")
     return True
+
 
 
 
 # Função enviar todo o banco de dados
 @app.route('/all_db', methods=['GET'])
 def enviar_db():
-    """if not authenticate():
-        return abort(401)"""
+    if not authenticate():
+        return abort(401)
 
     try:
         # Conecte-se ao banco de dados SQLite 
@@ -64,7 +71,9 @@ def enviar_db():
 
 # Passar query
 @app.route('/query', methods=['POST'])
-def recebe_query(): 
+def recebe_query():
+    if not authenticate():
+        return abort(401)
     try:
         # Obtenha a consulta SQL do corpo da solicitação (POST)
         query = request.get_data(as_text=True)
@@ -101,8 +110,8 @@ def recebe_query():
 # Função criar 
 @app.route('/create_db',methods=['POST'] )
 def criar_db():
-    """if not authenticate():
-        return abort(401)"""
+    if not authenticate():
+        return abort(401)
     try:
         db.criar_db_sqlite()
         db.criar_login()
@@ -117,6 +126,8 @@ def criar_db():
 # Cadastrar novo contato
 @app.route('/novo_contato', methods=['POST'])
 def novo_contato():
+    if not authenticate():
+        return abort(401)
     try:
         # Recebe os dados JSON da solicitação POST
         dados = request.get_json()
@@ -156,9 +167,11 @@ def novo_contato():
 # Remover pelo ID
 @app.route('/remove_registro', methods=['POST'])
 def remove_registro():
+    if not authenticate():
+        return abort(401)
     try:
         dados = request.get_data(as_text=True)
-        print(f'Remover = {dados}\nTipo de dado = {type(dados)}')
+       # print(f'Remover = {dados}\nTipo de dado = {type(dados)}')
         conn = sqlite3.connect('openaai.db')
         cursor = conn.cursor()
         query = f"DELETE FROM clientes WHERE id = {dados}"
@@ -180,6 +193,8 @@ def remove_registro():
 
 @app.route('/update', methods = ['POST'])
 def update_id():
+    if not authenticate():
+        return abort(401)
     try:
         dados = request.get_data(as_text=True)
         print(f'Remover = {dados}\nTipo de dado = {type(dados)}')
@@ -205,6 +220,8 @@ def update_id():
 # Update confirma envio = Nao
 @app.route('/confirma_envio', methods = ['POST'])
 def confirma_envio():
+    if not authenticate():
+        return abort(401)
     try:
         conn = sqlite3.connect('openaai.db')
         cursor = conn.cursor()
@@ -229,6 +246,8 @@ def confirma_envio():
 # Deleta TODOS os clientes
 @app.route('/delete_clientes', methods = ['POST'])
 def delete_clientes():
+    if not authenticate():
+        return abort(401)
     try:
         conn = sqlite3.connect('openaai.db')
         cursor = conn.cursor()
@@ -250,6 +269,8 @@ def delete_clientes():
 # Contar todos os clientes
 @app.route('/contar_clientes', methods = ['GET'])
 def contar_clientes():
+    if not authenticate():
+        return abort(401)
     try:
         # Conecte-se ao banco de dados SQLite 
         conn = sqlite3.connect('openaai.db')
@@ -275,6 +296,8 @@ def contar_clientes():
 # Retornar primeiro cliente com ConfirmaEnvio = não
 @app.route('/confirmaEqualNao', methods = ['GET'])
 def confirmaEqualNao():
+    if not authenticate():
+        return abort(401)
     try:
         # Conecte-se ao banco de dados SQLite 
         conn = sqlite3.connect('openaai.db')
@@ -301,10 +324,141 @@ def confirmaEqualNao():
 
 
 
+#Cria um novo user
+
+@app.route('/new_user', methods = ['POST'])
+def new_user():
+    if not authenticate():
+        return abort(401)
+    try:
+        # Recebe os dados JSON da solicitação POST
+        dados = request.get_json()
+        print(f"Dados = {dados}")
+
+        # Extrai os campos necessários do JSON
+       
+        email = dados['email']
+        perfil = dados['perfil']
+        senha = dados['senha']
+        token = dados['token']
+        
+
+        # Conecta-se ao banco de dados
+        conn = sqlite3.connect('openaai.db')
+        cursor = conn.cursor()
+
+        
+        # Executa a query SQL para inserir um novo usuário na tabela
+        query = "INSERT INTO users (email, perfil,senha, token) VALUES (?, ?, ?, ?)"
+        cursor.execute(query, (email, perfil,senha, token))
+
+        # Comita a transação e fecha a conexão com o banco de dados
+        conn.commit()
+        conn.close()
+
+        # Retorna uma resposta de sucesso
+        return jsonify({'message': 'User adicionado com sucesso'}), 201
+
+    except Exception as e:
+        # Em caso de erro, retorna uma resposta de erro
+        return jsonify({'error': str(e)}), 400
+
+
+
+# Remover usuário pelo email
+@app.route('/delete_user', methods=['POST'])
+def delete_user():
+    if not authenticate():
+        return abort(401)
+    try:
+        dados = request.get_data(as_text=True)
+       # print(f'Remover = {dados}\nTipo de dado = {type(dados)}')
+        conn = sqlite3.connect('openaai.db')
+        cursor = conn.cursor()
+        query = f"DELETE FROM users WHERE email = '{dados}'"
+        print(query)
+        # Execute a consulta SQL
+        cursor.execute(query)
+        conn.commit()
+        conn.close()
+        
+        # Retorna uma resposta de sucesso
+        return jsonify({'message': 'User removido com sucesso'}), 201
+    except Exception as e:
+        # Em caso de erro, retorna uma resposta de erro
+        return jsonify({'error': str(e)}), 400
+
+
+# Alterar senha do usuário pelo email
+@app.route('/update_password', methods=['POST'])
+def update_password():
+    try:
+        # Recebe o email e a nova senha do usuário a ser atualizada no corpo da solicitação POST
+        data = request.get_json()
+        email = data['email']
+        new_password = data['new_password']
+
+        # Conecta-se ao banco de dados
+        conn = sqlite3.connect('openaai.db')
+        cursor = conn.cursor()
+
+        # Executa a query SQL para atualizar a senha do usuário com base no email
+        query = "UPDATE users SET senha = ? WHERE email = ?"
+        cursor.execute(query, (new_password, email))
+
+        # Comita a transação e fecha a conexão com o banco de dados
+        conn.commit()
+        conn.close()
+
+        # Retorna uma resposta de sucesso
+        return jsonify({'message': 'Senha atualizada com sucesso'}), 200
+
+    except Exception as e:
+        # Em caso de erro, retorna uma resposta de erro
+        return jsonify({'error': str(e)}), 400
+
+
+# Alterar token do usuário
+@app.route('/update_token', methods=['POST'])
+def update_token():
+    try:
+        # Recebe o email e o novo token do usuário a ser atualizado no corpo da solicitação POST
+        data = request.get_json()
+        email = data['email']
+        new_token = data['new_token']
+
+        # Conecta-se ao banco de dados
+        conn = sqlite3.connect('openaai.db')
+        cursor = conn.cursor()
+
+        # Executa a query SQL para atualizar o token do usuário com base no email
+        query = "UPDATE users SET token = ? WHERE email = ?"
+        cursor.execute(query, (new_token, email))
+
+        # Comita a transação e fecha a conexão com o banco de dados
+        conn.commit()
+        conn.close()
+
+        # Retorna uma resposta de sucesso
+        return jsonify({'message': 'Token atualizado com sucesso'}), 200
+
+    except Exception as e:
+        # Em caso de erro, retorna uma resposta de erro
+        return jsonify({'error': str(e)}), 400
+
+
+
+
+
+
+
+
 # Conferir API online
 
 @app.route('/', methods=['GET'])
 def enviar_status():
+    if not authenticate():
+        return abort(401)
     try:
         return jsonify({"mensagem": "API online.", "GPT": "Status - OK"}), 200
     except Exception as e:
@@ -318,7 +472,6 @@ def enviar_status():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
 
 
 

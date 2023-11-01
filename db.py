@@ -12,9 +12,10 @@ def criar_login():
     cursor = conn.cursor()
     create_table_query = '''
     CREATE TABLE IF NOT EXISTS users (
-        id TEXT,
-        nome TEXT,
+        id INTEGER PRIMARY KEY,
+        email TEXT,
         perfil TEXT,
+        senha TEXT,
         token TEXT
     )
     '''

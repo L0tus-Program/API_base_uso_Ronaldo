@@ -64,6 +64,10 @@ A API estará disponível em http://localhost:5000.
 - /delete_clientes (POST): Exclua todos os registros de clientes.
 - /contar_clientes (GET): Contagem total de registros de clientes.
 - /confirmaEqualNao (GET): Retorne o primeiro cliente com ConfirmaEnvio "não".
+- /new_user (POST): Crie um novo usuário.
+- /delete_user (POST): Remova um usuário pelo email.
+- /update_password (POST): Atualize a senha de um usuário pelo email.
+- /update_token (POST): Atualize o token de um usuário pelo email.
 
 ## Contribuindo
 

@@ -7,10 +7,12 @@ def inserir_dados():
     api_url = 'http://localhost:5000/novo_contato'  # Substitua pela URL da sua API
     content_type = 'application/json'  # Tipo de conteúdo apropriado para a sua API
     #sql_query = 'SELECT * FROM Clientes'  # Sua consulta SQL
-
+    api_key = "F14C7D7625414A3E5DA1811349667"
+    
     # Cabeçalho da solicitação
     headers = {
         'Content-Type': content_type,
+        'X-API-KEY': str(api_key)
     }
 
     # Corpo da solicitação
@@ -56,11 +58,13 @@ def deletar():
      # Dados da solicitação POST
     api_url = 'http://localhost:5000/remove_registro'  # Substitua pela URL da sua API
     content_type = 'application/text'  # Tipo de conteúdo apropriado para a sua API
-    #sql_query = 'SELECT * FROM Clientes'  # Sua consulta SQL
-
+    
+    api_key = "F14C7D7625414A3E5DA1811349667"
+    
     # Cabeçalho da solicitação
     headers = {
         'Content-Type': content_type,
+        'X-API-KEY': str(api_key)
     }
     data = input("Qual ID deseja deletar ? ")
     # Enviando a solicitação POST
@@ -85,12 +89,13 @@ def update():
     api_url = 'http://localhost:5000/update'  # Substitua pela URL da sua API
     content_type = 'application/json'  # Tipo de conteúdo apropriado para a sua API
     #sql_query = 'SELECT * FROM Clientes'  # Sua consulta SQL
-
+    api_key = "F14C7D7625414A3E5DA1811349667"
+    
     # Cabeçalho da solicitação
     headers = {
         'Content-Type': content_type,
+        'X-API-KEY': str(api_key)
     }
-
     # Corpo da solicitação
     #data = sql_query
 
@@ -135,10 +140,12 @@ def contar():
     api_url = 'http://localhost:5000/contar_clientes'  # Substitua pela URL da sua API
     content_type = 'application/data'  # Tipo de conteúdo apropriado para a sua API
     #sql_query = 'SELECT * FROM Clientes'  # Sua consulta SQL
-
+    api_key = "F14C7D7625414A3E5DA1811349667"
+    
     # Cabeçalho da solicitação
     headers = {
         'Content-Type': content_type,
+        'X-API-KEY': str(api_key)
     }
 
     
@@ -161,14 +168,62 @@ def criar_db():
     api_url = 'http://localhost:5000/create_db'  # Substitua pela URL da sua API
     content_type = 'application/text'  # Tipo de conteúdo apropriado para a sua API
     #sql_query = 'SELECT * FROM Clientes'  # Sua consulta SQL
-
+    api_key = "F14C7D7625414A3E5DA1811349667"
+    
     # Cabeçalho da solicitação
     headers = {
         'Content-Type': content_type,
+        'X-API-KEY': str(api_key)
     }
 
     # Enviando a solicitação POST
-    response = requests.post(api_url)
+    response = requests.post(api_url,headers= headers)
+
+
+    # Verificando a resposta
+    if response.status_code == 200:
+        print('Solicitação POST bem-sucedida')
+        print('Resposta da API:', response.json())
+    else:
+        print('Falha na solicitação POST')
+        print('Código de status:', response.status_code)
+        print('Resposta da API:', response.text)
+
+def inserir_user():
+    # Dados da solicitação POST
+    api_url = 'http://localhost:5000/new_user'  # Substitua pela URL da sua API
+    content_type = 'application/json'  # Tipo de conteúdo apropriado para a sua API
+    #sql_query = 'SELECT * FROM Clientes'  # Sua consulta SQL
+    api_key = "F14C7D7625414A3E5DA1811349667"
+    
+    # Cabeçalho da solicitação
+    headers = {
+        'Content-Type': content_type,
+        'X-API-KEY': str(api_key)
+    }
+
+    # Corpo da solicitação
+    #data = sql_query
+
+
+    email = input('Email = ')
+    perfil = input ('perfil = ')
+    senha = input ('senha = ')
+    token = input ('token = ')
+    
+
+
+    # Corpo da solicitação
+    data = {
+        "email": email,
+        "perfil": perfil,
+        "senha": senha,
+        "token": token
+       
+    }
+
+    # Enviando a solicitação POST
+    response = requests.post(api_url, headers=headers, json=data)
 
 
     # Verificando a resposta
@@ -182,8 +237,123 @@ def criar_db():
 
 
 
+def delete_user():
+     # Dados da solicitação POST
+    api_url = 'http://localhost:5000/delete_user'  # Substitua pela URL da sua API
+    content_type = 'application/text'  # Tipo de conteúdo apropriado para a sua API
+    
+    api_key = "F14C7D7625414A3E5DA1811349667"
+    
+    # Cabeçalho da solicitação
+    headers = {
+        'Content-Type': content_type,
+        'X-API-KEY': str(api_key)
+    }
+    data = input("Qual email user deseja deletar ? ")
+    # Enviando a solicitação POST
+    response = requests.post(api_url, headers=headers, data=data)
+    """
+    # Enviando a solicitação POST
+    response = requests.post(api_url, headers=headers, json=data_json)"""
+
+    # Verificando a resposta
+    if response.status_code == 200:
+        print('Solicitação POST bem-sucedida')
+        print('Resposta da API:', response.json())
+    else:
+        print('Falha na solicitação POST')
+        print('Código de status:', response.status_code)
+        print('Resposta da API:', response.text)
+
+
+
+def altera_senha():
+    # Dados da solicitação POST
+    api_url = 'http://localhost:5000/update_password'  # Substitua pela URL da sua API
+    content_type = 'application/json'  # Tipo de conteúdo apropriado para a sua API
+    #sql_query = 'SELECT * FROM Clientes'  # Sua consulta SQL
+    api_key = "F14C7D7625414A3E5DA1811349667"
+    
+    # Cabeçalho da solicitação
+    headers = {
+        'Content-Type': content_type,
+        'X-API-KEY': str(api_key)
+    }
+
+    # Corpo da solicitação
+    #data = sql_query
+
+
+    email = input("Insira o email : ")
+    new_password = input("Insira a nova senha : ")
+   
+
+
+    # Corpo da solicitação
+    data = {
+        "email": email,
+        "new_password": new_password
+        
+    }
+
+    # Enviando a solicitação POST
+    response = requests.post(api_url, headers=headers, json=data)
+  
+
+    # Verificando a resposta
+    if response.status_code == 200:
+        print('Solicitação POST bem-sucedida')
+        print('Resposta da API:', response.json())
+    else:
+        print('Falha na solicitação POST')
+        print('Código de status:', response.status_code)
+        print('Resposta da API:', response.text)
+    
+
+def altera_token():
+    # Dados da solicitação POST
+    api_url = 'http://localhost:5000/update_token'  # Substitua pela URL da sua API
+    content_type = 'application/json'  # Tipo de conteúdo apropriado para a sua API
+    api_key = "F14C7D7625414A3E5DA1811349667"
+    
+    # Cabeçalho da solicitação
+    headers = {
+        'Content-Type': content_type,
+        'X-API-KEY': str(api_key)
+    }
+
+    # Corpo da solicitação
+    
+
+    email = input("Insira o email : ")
+    new_token = input("Insira o novo token : ")
+   
+
+
+    # Corpo da solicitação
+    data = {
+        "email": email,
+        "new_token": new_token
+        
+    }
+
+    # Enviando a solicitação POST
+    response = requests.post(api_url, headers=headers, json=data)
+  
+
+    # Verificando a resposta
+    if response.status_code == 200:
+        print('Solicitação POST bem-sucedida')
+        print('Resposta da API:', response.json())
+    else:
+        print('Falha na solicitação POST')
+        print('Código de status:', response.status_code)
+        print('Resposta da API:', response.text)
+    
+
+
 while True:    
-    menu = input("1 - Inserir dados\n2 - Deletar dados\n4 - Contar clientes\n5 - Criar DB\n0 - SAIR\n")
+    menu = input("1 - Inserir dados\n2 - Deletar dados\n4 - Contar clientes\n5 - Criar DB\n6 - Inserir USER\n7 - Delete user\n8 - Altera senha USER\n9 - Update token\n0 - SAIR\n")
     match menu:
         case '1':
             inserir_dados()
@@ -195,6 +365,14 @@ while True:
             contar()
         case '5':
             criar_db()
+        case '6':
+            inserir_user()
+        case '7':
+            delete_user()
+        case '8':
+            altera_senha()
+        case '9':
+            altera_token()
         case '0':
             break
         case __:
