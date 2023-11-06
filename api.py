@@ -2,6 +2,9 @@ from flask import Flask, request, jsonify, abort
 import db
 import sqlite3
 import json 
+import datetime
+import secrets
+import jwt
 
 # Abra o arquivo JSON
 with open('src.json', 'r') as file:
@@ -10,6 +13,10 @@ with open('src.json', 'r') as file:
 
 # key API
 API_KEY = str(src['key'])
+
+# Sua chave secreta para assinar tokens JWT
+SECRET_KEY = secrets.token_urlsafe(32)
+#SECRET_KEY = str(datetime.datetime.utcnow() + datetime.timedelta(days=1))
 
 # Outras configurações do aplicativo
 DEBUG = True
@@ -28,13 +35,47 @@ def authenticate():
     print("Autenticado")
     return True
 
+# Função pra criação de log
+def log_request(request, response):
+    try:
+        with open("log.txt", "a") as log_file:
+            current_time = datetime.datetime.now().strftime('%d-%m-%Y %H:%M:%S')
+            ip_address = request.remote_addr
+            request_content = request.data.decode('utf-8')
+            response_content = response.get_data(as_text=True)
+            log_entry = f"{current_time} - IP: {ip_address}\nRequest Content:\n{request_content}\nResponse Content:\n{response_content}\n\n"
+            log_file.write(log_entry)
+    except Exception as e:
+        # Em caso de erro ao registrar o log, você pode optar por fazer algum tratamento específico ou simplesmente ignorá-lo.
+        pass
 
+
+
+# Cifra de Cesar
+
+def cifra(text):
+    shift = 22
+    encrypted_text = ""
+    for char in text:
+        if char.isalpha():
+            is_upper = char.isupper()
+            char = char.lower()
+            char_code = ord(char)
+            encrypted_char_code = ((char_code - ord('a') + shift) % 26) + ord('a') 
+            if is_upper:
+                encrypted_text += chr(encrypted_char_code).upper()
+            else:
+                encrypted_text += chr(encrypted_char_code)
+        else:
+            encrypted_text += char
+    return encrypted_text
 
 
 # Função enviar todo o banco de dados
 @app.route('/all_db', methods=['GET'])
 def enviar_db():
     if not authenticate():
+        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
 
     try:
@@ -62,17 +103,25 @@ def enviar_db():
 
         # Feche a conexão com o banco de dados
         conn.close()
-
-        # Envie os dados como resposta em formato JSON
-        return jsonify({"mensagem": "Dados do banco de dados", "dados": dados_json}), 200
+        payload = {
+        'data': dados_json,
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
+        secret_cifra = cifra(SECRET_KEY)
+        return jsonify({"mensagem": "Dados do banco de dados", "key": secret_cifra,"token": token}),200
+        
+    
 
     except Exception as e:
         return jsonify({"erro": "Erro ao processar dados do banco de dados", "mensagem": str(e)}), 400
 
-# Passar query
+# Passar query --> Será desativada 
 @app.route('/query', methods=['POST'])
 def recebe_query():
     if not authenticate():
+        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
     try:
         # Obtenha a consulta SQL do corpo da solicitação (POST)
@@ -100,6 +149,8 @@ def recebe_query():
 
         # Envie os dados como resposta em formato JSON
         print(results)
+        log_request(request, jsonify({'message': results}))
+        
         return jsonify(results), 200
 
     except Exception as e:
@@ -111,11 +162,21 @@ def recebe_query():
 @app.route('/create_db',methods=['POST'] )
 def criar_db():
     if not authenticate():
+        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
     try:
         db.criar_db_sqlite()
         db.criar_login()
-        return jsonify({"mensagem": "Banco de dados Criado com Sucesso"}), 200
+        log_request(request, jsonify({'message': 'Banco de dados Criado com Sucesso'}))
+        payload = {
+        'data': "Banco de dados criado com sucesso",
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
+        secret_cifra = cifra(SECRET_KEY)
+        return jsonify({"key": secret_cifra,"token": token}),200
+        
 
     except Exception as e:
         return jsonify({"erro": "Erro ao processar banco de dados", "mensagem": str(e)}), 400
@@ -126,7 +187,9 @@ def criar_db():
 # Cadastrar novo contato
 @app.route('/novo_contato', methods=['POST'])
 def novo_contato():
+    global SECRET_KEY
     if not authenticate():
+        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
     try:
         # Recebe os dados JSON da solicitação POST
@@ -153,7 +216,17 @@ def novo_contato():
         # Comita a transação e fecha a conexão com o banco de dados
         conn.commit()
         conn.close()
-
+        log_request(request, jsonify({'message': 'Cliente adicionado com sucesso'}))
+        payload = {
+        'data': "Cliente adicionado com sucesso",
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
+        secret_cifra = cifra(SECRET_KEY)
+        return jsonify({"key": secret_cifra,"token": token}),200
+        # Log da requisição e da resposta
+        log_request(request, jsonify({'message': 'Cliente adicionado com sucesso'}))
         # Retorna uma resposta de sucesso
         return jsonify({'message': 'Cliente adicionado com sucesso'}), 201
 
@@ -168,6 +241,7 @@ def novo_contato():
 @app.route('/remove_registro', methods=['POST'])
 def remove_registro():
     if not authenticate():
+        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
     try:
         dados = request.get_data(as_text=True)
@@ -179,9 +253,15 @@ def remove_registro():
         cursor.execute(query)
         conn.commit()
         conn.close()
-        
-        # Retorna uma resposta de sucesso
-        return jsonify({'message': 'Cliente removido com sucesso'}), 201
+        payload = {
+        'data': "Cliente removido com sucesso",
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
+        secret_cifra = cifra(SECRET_KEY)
+        return jsonify({"key": secret_cifra,"token": token}),200
+       
     except Exception as e:
         # Em caso de erro, retorna uma resposta de erro
         return jsonify({'error': str(e)}), 400
@@ -190,10 +270,10 @@ def remove_registro():
 
 
 # Update pelo ID
-
 @app.route('/update', methods = ['POST'])
 def update_id():
     if not authenticate():
+        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
     try:
         dados = request.get_data(as_text=True)
@@ -205,9 +285,15 @@ def update_id():
         cursor.execute(query,(dados['nome'], dados['numero'], dados['ConfirmouWP'], dados['ConfirmaEnvio'], dados['id']))
         conn.commit()
         conn.close()
+        payload = {
+        'data': "Cliente atualizado com sucesso",
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
+        secret_cifra = cifra(SECRET_KEY)
+        return jsonify({"key": secret_cifra,"token": token}),200
         
-        # Retorna uma resposta de sucesso
-        return jsonify({'message': 'Cliente atualizado com sucesso'}), 201
     except Exception as e:
         # Em caso de erro, retorna uma resposta de erro
         return jsonify({'error': str(e)}), 400
@@ -221,6 +307,7 @@ def update_id():
 @app.route('/confirma_envio', methods = ['POST'])
 def confirma_envio():
     if not authenticate():
+        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
     try:
         conn = sqlite3.connect('openaai.db')
@@ -230,23 +317,25 @@ def confirma_envio():
         cursor.execute(query)
         conn.commit()
         conn.close()
+        payload = {
+        'data': "Clientes adicionados com sucesso",
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
+        secret_cifra = cifra(SECRET_KEY)
+        return jsonify({"key": secret_cifra,"token": token}),200
         
-        # Retorna uma resposta de sucesso
-        return jsonify({'message': 'Clientes atualizados com sucesso'}), 201
     except Exception as e:
         # Em caso de erro, retorna uma resposta de erro
         return jsonify({'error': str(e)}), 400
-
-
-
-
-
 
 
 # Deleta TODOS os clientes
 @app.route('/delete_clientes', methods = ['POST'])
 def delete_clientes():
     if not authenticate():
+        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
     try:
         conn = sqlite3.connect('openaai.db')
@@ -264,12 +353,12 @@ def delete_clientes():
         return jsonify({'error': str(e)}), 400
 
 
-
-
 # Contar todos os clientes
 @app.route('/contar_clientes', methods = ['GET'])
 def contar_clientes():
     if not authenticate():
+        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+        
         return abort(401)
     try:
         # Conecte-se ao banco de dados SQLite 
@@ -283,9 +372,15 @@ def contar_clientes():
 
         # Feche a conexão com o banco de dados
         conn.close()
-
-        # Envie os dados como resposta em formato JSON
-        return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
+        payload = {
+        'data': contador,
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
+        secret_cifra = cifra(SECRET_KEY)
+        return jsonify({"key": secret_cifra,"token": token}),200
+       
 
 
     except Exception as e:
@@ -297,6 +392,7 @@ def contar_clientes():
 @app.route('/confirmaEqualNao', methods = ['GET'])
 def confirmaEqualNao():
     if not authenticate():
+        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
     try:
         # Conecte-se ao banco de dados SQLite 
@@ -313,9 +409,23 @@ def confirmaEqualNao():
 
         # Envie os dados como resposta em formato JSON
         if registro is None:
-            return jsonify({"mensagem": "Nenhum cliente encontrado!", "registro": registro}), 200
-
-        return jsonify({"mensagem": "Contagem de registros", "registro": registro}), 200
+             payload = {
+                'data': "Nenhum cliente encontrado",
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+                }
+             token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        
+             secret_cifra = cifra(SECRET_KEY)
+             return jsonify({"key": secret_cifra,"token": token}),200
+             
+        payload = {
+        'data': registro,
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+       
+        secret_cifra = cifra(SECRET_KEY)
+        return jsonify({"key": secret_cifra,"token": token}),200
 
 
     except Exception as e:
@@ -329,6 +439,7 @@ def confirmaEqualNao():
 @app.route('/new_user', methods = ['POST'])
 def new_user():
     if not authenticate():
+        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
     try:
         # Recebe os dados JSON da solicitação POST
@@ -355,9 +466,15 @@ def new_user():
         # Comita a transação e fecha a conexão com o banco de dados
         conn.commit()
         conn.close()
+        payload = {
+        'data': "User adicionado com sucesso",
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        secret_cifra = cifra(SECRET_KEY)
+        return jsonify({"key": secret_cifra,"token": token}),200
 
-        # Retorna uma resposta de sucesso
-        return jsonify({'message': 'User adicionado com sucesso'}), 201
+        
 
     except Exception as e:
         # Em caso de erro, retorna uma resposta de erro
@@ -369,6 +486,7 @@ def new_user():
 @app.route('/delete_user', methods=['POST'])
 def delete_user():
     if not authenticate():
+        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
     try:
         dados = request.get_data(as_text=True)
@@ -381,9 +499,14 @@ def delete_user():
         cursor.execute(query)
         conn.commit()
         conn.close()
-        
-        # Retorna uma resposta de sucesso
-        return jsonify({'message': 'User removido com sucesso'}), 201
+        payload = {
+        'data': "User removido com sucesso",
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        secret_cifra = cifra(SECRET_KEY)
+        return jsonify({"key": secret_cifra,"token": token}),200
+       
     except Exception as e:
         # Em caso de erro, retorna uma resposta de erro
         return jsonify({'error': str(e)}), 400
@@ -392,6 +515,9 @@ def delete_user():
 # Alterar senha do usuário pelo email
 @app.route('/update_password', methods=['POST'])
 def update_password():
+    if not authenticate():
+        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+        return abort(401)
     try:
         # Recebe o email e a nova senha do usuário a ser atualizada no corpo da solicitação POST
         data = request.get_json()
@@ -409,9 +535,15 @@ def update_password():
         # Comita a transação e fecha a conexão com o banco de dados
         conn.commit()
         conn.close()
+        payload = {
+        'data': "Senha atualizada com sucesso",
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        secret_cifra = cifra(SECRET_KEY)
+        return jsonify({"key": secret_cifra,"token": token}),200
 
-        # Retorna uma resposta de sucesso
-        return jsonify({'message': 'Senha atualizada com sucesso'}), 200
+       
 
     except Exception as e:
         # Em caso de erro, retorna uma resposta de erro
@@ -421,6 +553,9 @@ def update_password():
 # Alterar token do usuário
 @app.route('/update_token', methods=['POST'])
 def update_token():
+    if not authenticate():
+        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+        return abort(401)
     try:
         # Recebe o email e o novo token do usuário a ser atualizado no corpo da solicitação POST
         data = request.get_json()
@@ -438,18 +573,18 @@ def update_token():
         # Comita a transação e fecha a conexão com o banco de dados
         conn.commit()
         conn.close()
+        payload = {
+        'data': "Token atualizado com sucesso",
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        secret_cifra = cifra(SECRET_KEY)
+        return jsonify({"key": secret_cifra,"token": token}),200
 
-        # Retorna uma resposta de sucesso
-        return jsonify({'message': 'Token atualizado com sucesso'}), 200
 
     except Exception as e:
         # Em caso de erro, retorna uma resposta de erro
         return jsonify({'error': str(e)}), 400
-
-
-
-
-
 
 
 
@@ -458,13 +593,19 @@ def update_token():
 @app.route('/', methods=['GET'])
 def enviar_status():
     if not authenticate():
+        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
     try:
-        return jsonify({"mensagem": "API online.", "GPT": "Status - OK"}), 200
+        payload = {
+        'data': "API online.", "GPT": "Status - OK",
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        secret_cifra = cifra(SECRET_KEY)
+        return jsonify({"key": secret_cifra,"token": token}),200
+        
     except Exception as e:
         return jsonify({"erro": "Erro ao acessar dados"}), 400
-
-
 
 
 

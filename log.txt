@@ -1,0 +1,495 @@
+03-11-2023 16:45:14 - IP: 127.0.0.1
+Request Content:
+{"id": "12321", "nome": "Teste data", "numero": "1234", "codClient": "1234", "ConfirmouWP": "123", "ConfirmaEnvio": "12", "enviar": 1}
+Response Content:
+{
+  "message": "Cliente adicionado com sucesso"
+}
+
+
+06-11-2023 09:35:30 - IP: 127.0.0.1
+Request Content:
+{"id": "1234", "nome": "Teste nbovo jwt", "numero": "1234", "codClient": "123", "ConfirmouWP": "123", "ConfirmaEnvio": "123", "enviar": 1}
+Response Content:
+{
+  "message": "Cliente adicionado com sucesso"
+}
+
+
+06-11-2023 09:54:12 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "vOFcD_pMpcRaX6oOFPpj7zycJDM5MG2Ww_LHOad60iI",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 09:56:35 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "EdYpuM74sQb2U4Jsv8ZpDXftSkicYshqUnVZBJtsvDk",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 09:57:21 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "Q4y9ThjKEGnj-jyR_JCt9AXQMP7OWf529hWXdEAe_zY",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 09:58:00 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "r7NpV2qDCP7aIfCnxI-N-hrFY2Z4ctH494l7AYkwxyM",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 10:00:29 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "ItZ4EANvptsxkFsliICexmBR7sTsjTqpfv1cRN54OWQ",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 10:01:18 - IP: 127.0.0.1
+Request Content:
+{"id": "1234", "nome": "Felipe testandoo", "numero": "12345", "codClient": "FALS", "ConfirmouWP": "asdl", "ConfirmaEnvio": "dsal", "enviar": 1}
+Response Content:
+{
+  "message": "Cliente adicionado com sucesso"
+}
+
+
+06-11-2023 10:02:56 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "LOJ_4mTBwmuVQENizo0VwJk-DwGeqXzJMGeHb2RX294",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 10:03:07 - IP: 127.0.0.1
+Request Content:
+{"id": "7676", "nome": "45", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "message": "Cliente adicionado com sucesso"
+}
+
+
+06-11-2023 10:05:08 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "oQNuN72uQxZwd3geYVgJn0ozf3KIA5c8K_43zFNMdPI",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 10:05:19 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "message": "Cliente adicionado com sucesso"
+}
+
+
+06-11-2023 10:06:09 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "Z0OD1z40g35kOkcYYUw0Wfwwh8k8wsGM2o35vVtTv3o",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 10:06:29 - IP: 127.0.0.1
+Request Content:
+{"id": "123", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "message": "Cliente adicionado com sucesso"
+}
+
+
+06-11-2023 10:07:56 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "-XBOPziK304XSyzPzZvT-SUSemuEuCv46TLMKdjzzOE",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 10:08:07 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "message": "Cliente adicionado com sucesso"
+}
+
+
+06-11-2023 10:10:13 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "CXQdTok321zD7pZFDKAkbugfb313XoRCHHmBa2AsO5w",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 10:10:29 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "321", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "message": "Cliente adicionado com sucesso"
+}
+
+
+06-11-2023 10:13:58 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "kLE46DN4nSEgZrU2YXrF1hCAWEQiS3nTXs9C5pSk3Zs",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 10:14:08 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "message": "Cliente adicionado com sucesso"
+}
+
+
+06-11-2023 10:14:43 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "x7fUHNGQbP35tjrqOv38Q3fZQ5-4DQqWEHDNMidlC5w",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 10:14:53 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "message": "Cliente adicionado com sucesso"
+}
+
+
+06-11-2023 10:15:34 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "Vj74lt1B5Z2HGFnWVvnniOtVCDJaZsC_U_GgXKMvuvs",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 10:15:45 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "message": "Cliente adicionado com sucesso"
+}
+
+
+06-11-2023 10:16:43 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "banana",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 10:16:53 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "message": "Cliente adicionado com sucesso"
+}
+
+
+06-11-2023 10:22:18 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "Tue, 07 Nov 2023 13:21:58 GMT",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 10:22:33 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "11", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "message": "Cliente adicionado com sucesso"
+}
+
+
+06-11-2023 10:23:40 - IP: 127.0.0.1
+Request Content:
+{"id": "teste", "nome": "teste", "numero": "test", "codClient": "test", "ConfirmouWP": "teste", "ConfirmaEnvio": "teste", "enviar": 1}
+Response Content:
+{
+  "message": "Cliente adicionado com sucesso"
+}
+
+
+06-11-2023 10:26:43 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "2023-11-07 13:26:15.923905",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 10:26:51 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "message": "Cliente adicionado com sucesso"
+}
+
+
+06-11-2023 10:27:36 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "2023-11-07 13:27:32.840952",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 10:27:43 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "message": "Cliente adicionado com sucesso"
+}
+
+
+06-11-2023 10:27:58 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "2023-11-07 13:27:32.840952",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 10:29:35 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "2023-11-07 13:29:29.835319",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 10:29:43 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "message": "Cliente adicionado com sucesso"
+}
+
+
+06-11-2023 10:38:20 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "2023-11-07 13:38:09.000030",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 10:38:33 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "message": "Cliente adicionado com sucesso"
+}
+
+
+06-11-2023 10:40:39 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "2023-11-07 13:40:37.633430",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 10:40:48 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "message": "Cliente adicionado com sucesso"
+}
+
+
+06-11-2023 10:42:45 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "2023-11-07 13:42:43.524048",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 10:42:52 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "message": "Cliente adicionado com sucesso"
+}
+
+
+06-11-2023 10:45:24 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "2023-11-07 13:45:20.143784",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 10:45:33 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "message": "Cliente adicionado com sucesso"
+}
+
+
+06-11-2023 13:37:27 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "s9YgssC46vF42yaIjZJQZSPUUrZ0PsbxqFe6LyTuAIo",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 13:37:58 - IP: 127.0.0.1
+Request Content:
+{"id": "1234", "nome": "Testando a cifrazinha ", "numero": "1234", "codClient": "123", "ConfirmouWP": "123", "ConfirmaEnvio": "123", "enviar": 1}
+Response Content:
+{
+  "message": "Cliente adicionado com sucesso"
+}
+
+
+06-11-2023 13:40:07 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "cGTNYFx9TlZclft8DfC7xnsc_EwSvc7hZZPDMKdgkoY",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 13:40:15 - IP: 127.0.0.1
+Request Content:
+{"id": "123", "nome": "123", "numero": "123", "codClient": "123", "ConfirmouWP": "13", "ConfirmaEnvio": "123", "enviar": 1}
+Response Content:
+{
+  "message": "Cliente adicionado com sucesso"
+}
+
+
+06-11-2023 13:41:02 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "cGTNYFx9TlZclft8DfC7xnsc_EwSvc7hZZPDMKdgkoY",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 13:41:20 - IP: 127.0.0.1
+Request Content:
+{"id": "123", "nome": "123", "numero": "123", "codClient": "123", "ConfirmouWP": "123", "ConfirmaEnvio": "123", "enviar": 1}
+Response Content:
+{
+  "message": "Cliente adicionado com sucesso"
+}
+
+
+06-11-2023 13:41:35 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "key": "S1Vw8IIUPW3J6EYGy3nd-c947UTNV69TRDlIraIY8Eo",
+  "mensagem": "SK solicitada"
+}
+
+
+06-11-2023 13:41:53 - IP: 127.0.0.1
+Request Content:
+{"id": "123", "nome": "123", "numero": "123", "codClient": "123", "ConfirmouWP": "123", "ConfirmaEnvio": "123", "enviar": 1}
+Response Content:
+{
+  "message": "Cliente adicionado com sucesso"
+}
+
+

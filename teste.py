@@ -1,6 +1,57 @@
 import requests
 import json
+import jwt
+# Decifra cifra da Key
+def cifra(text):
+    # Casas a mover
+    shift = 22
+    decrypted_text = ""
+    for char in text:
+        if char.isalpha():
+            is_upper = char.isupper()
+            char = char.lower()
+            char_code = ord(char)
+            decrypted_char_code = ((char_code - ord('a') - shift) % 26) + ord('a') 
+            if is_upper:
+                decrypted_text += chr(decrypted_char_code).upper()
+            else:
+                decrypted_text += chr(decrypted_char_code)
+        else:
+            decrypted_text += char
+    return decrypted_text
 
+
+
+def secret():
+    api_url = 'http://localhost:5000/secret'  # Substitua pela URL da sua API
+    content_type = 'application/json'  # Tipo de conteúdo apropriado para a sua API
+    #sql_query = 'SELECT * FROM Clientes'  # Sua consulta SQL
+    api_key = "F14C7D7625414A3E5DA1811349667"
+    
+    # Cabeçalho da solicitação
+    headers = {
+        'Content-Type': content_type,
+        'X-API-KEY': str(api_key)
+    }
+
+    
+    # Enviando a solicitação POST
+    response = requests.get(api_url, headers=headers)
+    
+    # Verificando a resposta
+    if response.status_code == 200:
+        """print('Solicitação POST bem-sucedida')
+        print('Resposta da API:', response.json())"""
+        key = response.json()
+        return key.get("dados")
+    else:
+        print('Falha na solicitação POST')
+        print('Código de status:', response.status_code)
+        print('Resposta da API:', response.text)
+
+
+secret_key = secret()
+print(secret_key)
 
 def inserir_dados():   
     # Dados da solicitação POST
@@ -38,21 +89,30 @@ def inserir_dados():
         "ConfirmaEnvio": ConfirmaEnvio,
         "enviar" : int(envia)
     }
+ 
 
     # Enviando a solicitação POST
     response = requests.post(api_url, headers=headers, json=data)
+    segredo = response.json()
+    data = segredo.get("token")
+    segredo = segredo.get("key")
+    segredo = cifra(segredo)
+    # Descriptografe o token usando a mesma chave secreta
+    dados = jwt.decode(data, segredo, algorithms=['HS256'])
+    print(dados)
     """
     # Enviando a solicitação POST
     response = requests.post(api_url, headers=headers, json=data_json)"""
 
     # Verificando a resposta
     if response.status_code == 200:
+        dados_json = dados.get('data')
         print('Solicitação POST bem-sucedida')
-        print('Resposta da API:', response.json())
+        print('Resposta da API:', dados_json)
     else:
         print('Falha na solicitação POST')
-        print('Código de status:', response.status_code)
-        print('Resposta da API:', response.text)
+        print('Código de status:', dados.status_code)
+        print('Resposta da API:', dados.text)
 
 def deletar():
      # Dados da solicitação POST
@@ -149,7 +209,7 @@ def contar():
     }
 
     
-    response = requests.get(api_url)
+    response = requests.get(api_url, headers=headers)
     """
     # Enviando a solicitação POST
     response = requests.post(api_url, headers=headers, json=data_json)"""
