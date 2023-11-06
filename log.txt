@@ -493,3 +493,15 @@ Response Content:
 }
 
 
+06-11-2023 15:09:11 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente adicionado com sucesso",
+    "exp": "Tue, 07 Nov 2023 18:09:11 GMT"
+  }
+}
+
+

@@ -107,6 +107,7 @@ def enviar_db():
         'data': dados_json,
         'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
         }
+        log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
         secret_cifra = cifra(SECRET_KEY)
@@ -175,6 +176,7 @@ def criar_db():
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
         secret_cifra = cifra(SECRET_KEY)
+        log_request(request, jsonify({'Payload': payload}))
         return jsonify({"key": secret_cifra,"token": token}),200
         
 
@@ -216,11 +218,12 @@ def novo_contato():
         # Comita a transação e fecha a conexão com o banco de dados
         conn.commit()
         conn.close()
-        log_request(request, jsonify({'message': 'Cliente adicionado com sucesso'}))
+        
         payload = {
         'data': "Cliente adicionado com sucesso",
         'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
         }
+        log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
         secret_cifra = cifra(SECRET_KEY)
@@ -260,6 +263,7 @@ def remove_registro():
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
         secret_cifra = cifra(SECRET_KEY)
+        log_request(request, jsonify({'Payload': payload}))
         return jsonify({"key": secret_cifra,"token": token}),200
        
     except Exception as e:
@@ -292,6 +296,7 @@ def update_id():
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
         secret_cifra = cifra(SECRET_KEY)
+        log_request(request, jsonify({'Payload': payload}))
         return jsonify({"key": secret_cifra,"token": token}),200
         
     except Exception as e:
@@ -324,6 +329,7 @@ def confirma_envio():
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
         secret_cifra = cifra(SECRET_KEY)
+        log_request(request, jsonify({'Payload': payload}))
         return jsonify({"key": secret_cifra,"token": token}),200
         
     except Exception as e:
@@ -345,6 +351,15 @@ def delete_clientes():
         cursor.execute(query)
         conn.commit()
         conn.close()
+        payload = {
+        'data': "Clientes deletados com sucesso",
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+        }
+        log_request(request, jsonify({'Payload': payload}))
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
+        secret_cifra = cifra(SECRET_KEY)
+        return jsonify({"key": secret_cifra,"token": token}),200
         
         # Retorna uma resposta de sucesso
         return jsonify({'message': 'Clientes deletados com sucesso'}), 201
@@ -376,6 +391,7 @@ def contar_clientes():
         'data': contador,
         'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
         }
+        log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
         secret_cifra = cifra(SECRET_KEY)
@@ -409,19 +425,20 @@ def confirmaEqualNao():
 
         # Envie os dados como resposta em formato JSON
         if registro is None:
-             payload = {
-                'data': "Nenhum cliente encontrado",
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
-                }
-             token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        
-             secret_cifra = cifra(SECRET_KEY)
-             return jsonify({"key": secret_cifra,"token": token}),200
+            payload = {
+            'data': "Nenhum cliente encontrado",
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+            }
+            token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+            log_request(request, jsonify({'Payload': payload}))
+            secret_cifra = cifra(SECRET_KEY)
+            return jsonify({"key": secret_cifra,"token": token}),200
              
         payload = {
         'data': registro,
         'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
         }
+        log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
        
         secret_cifra = cifra(SECRET_KEY)
@@ -470,6 +487,7 @@ def new_user():
         'data': "User adicionado com sucesso",
         'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
         }
+        log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         secret_cifra = cifra(SECRET_KEY)
         return jsonify({"key": secret_cifra,"token": token}),200
@@ -503,6 +521,7 @@ def delete_user():
         'data': "User removido com sucesso",
         'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
         }
+        log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         secret_cifra = cifra(SECRET_KEY)
         return jsonify({"key": secret_cifra,"token": token}),200
@@ -539,6 +558,7 @@ def update_password():
         'data': "Senha atualizada com sucesso",
         'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
         }
+        log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         secret_cifra = cifra(SECRET_KEY)
         return jsonify({"key": secret_cifra,"token": token}),200
@@ -577,6 +597,7 @@ def update_token():
         'data': "Token atualizado com sucesso",
         'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
         }
+        log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         secret_cifra = cifra(SECRET_KEY)
         return jsonify({"key": secret_cifra,"token": token}),200
@@ -600,6 +621,7 @@ def enviar_status():
         'data': "API online.", "GPT": "Status - OK",
         'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
         }
+        log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         secret_cifra = cifra(SECRET_KEY)
         return jsonify({"key": secret_cifra,"token": token}),200
