@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, abort
+from flask_cors import CORS
 import db
 import sqlite3
 import json 
@@ -26,14 +27,17 @@ PORT = 5000
 
 # Criando aplicação
 app = Flask(__name__)
+CORS(app)
 
 # Autenticação
 def authenticate():
     api_key = request.headers.get('X-API-KEY')
+    print(api_key)
     if api_key != API_KEY:
         return abort(401)
-    print("Autenticado")
-    return True
+    else:
+        print("Autenticado")
+        return True
 
 # Função pra criação de log
 def log_request(request, response):
@@ -149,10 +153,19 @@ def recebe_query():
         conn.close()
 
         # Envie os dados como resposta em formato JSON
-        print(results)
-        log_request(request, jsonify({'message': results}))
+        #print(results)
         
-        return jsonify(results), 200
+        payload = {
+        'data': results,
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+        }
+        log_request(request, jsonify({'Payload': payload}))
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
+        secret_cifra = cifra(SECRET_KEY)
+        return jsonify({"mensagem": "Dados do banco de dados", "key": secret_cifra,"token": token}),200
+        
+   
 
     except Exception as e:
         return jsonify({"erro": "Erro ao processar a consulta", "mensagem": str(e)}), 400
@@ -455,6 +468,7 @@ def confirmaEqualNao():
 
 @app.route('/new_user', methods = ['POST'])
 def new_user():
+    
     if not authenticate():
         log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
@@ -629,7 +643,47 @@ def enviar_status():
     except Exception as e:
         return jsonify({"erro": "Erro ao acessar dados"}), 400
 
-
+# Rota para verificar as credenciais
+@app.route("/verificar_credenciais", methods=["POST"])
+def verificar_credenciais():
+    if not authenticate():
+        return abort(401)
+    try:
+        # Obter os dados JSON enviados na solicitação
+        data = request.get_json()
+        email = data.get("email")
+        senha = data.get("senha")
+ 
+        # Conecte-se ao banco de dados SQLite
+        conn = sqlite3.connect("openaai.db")
+        cursor = conn.cursor()
+ 
+        # Execute uma consulta para verificar as credenciais (substitua com sua própria consulta)
+        cursor.execute(
+            "SELECT * FROM users WHERE email = ? AND senha = ?", (email, senha)
+        )
+        usuario = cursor.fetchone()
+ 
+        # Feche a conexão com o banco de dados
+        conn.close()
+ 
+        if usuario:
+            # Credenciais corretas, gera um token JWT
+            payload = {
+                "usuario": usuario[0],  # Assume que o primeiro campo é o ID do usuário
+                "email": email
+                # "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+            }
+            #token = jwt.encode(payload, chave_secreta, algorithm="HS256")
+            return jsonify({"mensagem": "Credenciais corretas", "token": payload}), 200
+        else:
+            return jsonify({"mensagem": "Credenciais incorretas"}), 401
+ 
+    except Exception as e:
+        return (
+            jsonify({"erro": "Erro ao verificar as credenciais", "mensagem": str(e)}),
+            500,
+        )
 
 
 

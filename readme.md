@@ -1,18 +1,27 @@
 # Documentação da API
 
+## Ultimas implementações
+
+- Criptografia dos dados enviados no JSOn de resposta, utilizando JWT
+- Criptografia da chave JWT com base em Cifra de Cesar
+
 ## Introdução
 
 Este projeto consiste em uma API criada com o Flask que permite gerenciar dados de clientes em um banco de dados SQLite. A API oferece várias funcionalidades, como adicionar novos clientes, consultar dados do banco de dados, atualizar informações de clientes e muito mais.
 
 ## Primeira execução
 
-Para primeira execução, não esqueça de utilizar o endpoint /create_db para criar o banco de dados SQLITE
+Para primeira execução, não esqueça de utilizar o endpoint /create_db para criar o banco de dados SQLITE.
+Também não esqueça de configurar uma chave para a sua API no src.json
 
 ## Requisitos
 
 - Python 3.x
 - Flask
+- Flask-cors
 - SQLITE 3
+- JWT
+  
 
 Todas as bibliotecas externas serão acrescentadas também ao requirements.txt
 
@@ -50,7 +59,7 @@ Para iniciar o servidor da API, execute o seguinte comando:
 
 python api.py
 
-A API estará disponível em http://localhost:5000.
+A API estará disponível em http://localhost:5000. OU outro ip/porta que você definir.
 
 # Endpoints
 
@@ -68,7 +77,7 @@ A API estará disponível em http://localhost:5000.
 - /delete_user (POST): Remova um usuário pelo email.
 - /update_password (POST): Atualize a senha de um usuário pelo email.
 - /update_token (POST): Atualize o token de um usuário pelo email.
-
+  
 ## Contribuindo
 
 Sinta-se à vontade para contribuir para este projeto. Você pode abrir problemas, enviar solicitações de pull e melhorar a documentação.

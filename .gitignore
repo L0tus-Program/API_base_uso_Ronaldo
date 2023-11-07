@@ -1,2 +1,4 @@
 /__pycache
 *.db
+/API em NODE
+srs.json
