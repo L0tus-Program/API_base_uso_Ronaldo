@@ -1,0 +1,134 @@
+07-11-2023 14:44:28 - IP: 127.0.0.1
+Request Content:
+{"id": "1235", "nome": "1234", "numero": "1234", "codClient": "132", "ConfirmouWP": "12", "ConfirmaEnvio": "12", "enviar": 1}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente adicionado com sucesso",
+    "exp": "Wed, 08 Nov 2023 17:44:28 GMT"
+  }
+}
+
+
+07-11-2023 14:48:21 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente adicionado com sucesso",
+    "exp": "Wed, 08 Nov 2023 17:48:21 GMT"
+  }
+}
+
+
+07-11-2023 14:49:32 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente adicionado com sucesso",
+    "exp": "Wed, 08 Nov 2023 17:49:32 GMT"
+  }
+}
+
+
+07-11-2023 14:50:21 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente adicionado com sucesso",
+    "exp": "Wed, 08 Nov 2023 17:50:21 GMT"
+  }
+}
+
+
+07-11-2023 14:52:08 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente adicionado com sucesso",
+    "exp": "Wed, 08 Nov 2023 17:52:08 GMT"
+  }
+}
+
+
+07-11-2023 14:53:15 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente adicionado com sucesso",
+    "exp": "Wed, 08 Nov 2023 17:53:15 GMT"
+  }
+}
+
+
+07-11-2023 15:00:17 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente adicionado com sucesso",
+    "exp": "Wed, 08 Nov 2023 18:00:17 GMT"
+  }
+}
+
+
+07-11-2023 15:02:38 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente adicionado com sucesso",
+    "exp": "Wed, 08 Nov 2023 18:02:38 GMT"
+  }
+}
+
+
+07-11-2023 15:22:10 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente adicionado com sucesso",
+    "exp": "Wed, 08 Nov 2023 18:22:10 GMT"
+  }
+}
+
+
+08-11-2023 10:37:08 - IP: 127.0.0.1
+Request Content:
+{"email":"ronaldo.lazzari@messeminvestimentos.com.br","senha":"perfil_desejado"}
+Response Content:
+{
+  "Payload": {
+    "email": "ronaldo.lazzari@messeminvestimentos.com.br",
+    "exp": "Thu, 09 Nov 2023 13:37:08 GMT",
+    "usuario": 3
+  }
+}
+
+
+08-11-2023 10:40:39 - IP: 127.0.0.1
+Request Content:
+{"email":"ronaldo.lazzari@messeminvestimentos.com.br","senha":"perfil_desejado"}
+Response Content:
+{
+  "Payload": {
+    "email": "ronaldo.lazzari@messeminvestimentos.com.br",
+    "exp": "Thu, 09 Nov 2023 13:40:39 GMT",
+    "usuario": 3
+  }
+}
+
+

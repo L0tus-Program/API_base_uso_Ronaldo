@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, abort
+from flask import Flask, request, jsonify, abort,render_template
 from flask_cors import CORS
 import db
 import sqlite3
@@ -6,6 +6,8 @@ import json
 import datetime
 import secrets
 import jwt
+from utils import *
+import threading
 
 # Abra o arquivo JSON
 with open('src.json', 'r') as file:
@@ -17,7 +19,7 @@ API_KEY = str(src['key'])
 
 # Sua chave secreta para assinar tokens JWT
 SECRET_KEY = secrets.token_urlsafe(32)
-#SECRET_KEY = str(datetime.datetime.utcnow() + datetime.timedelta(days=1))
+
 
 # Outras configurações do aplicativo
 DEBUG = True
@@ -27,7 +29,7 @@ PORT = 5000
 
 # Criando aplicação
 app = Flask(__name__)
-CORS(app)
+CORS(app) # Quando subir pra VPS, configurar domínios que podem acessar
 
 # Autenticação
 def authenticate():
@@ -38,138 +40,6 @@ def authenticate():
     else:
         print("Autenticado")
         return True
-
-# Função pra criação de log
-def log_request(request, response):
-    try:
-        with open("log.txt", "a") as log_file:
-            current_time = datetime.datetime.now().strftime('%d-%m-%Y %H:%M:%S')
-            ip_address = request.remote_addr
-            request_content = request.data.decode('utf-8')
-            response_content = response.get_data(as_text=True)
-            log_entry = f"{current_time} - IP: {ip_address}\nRequest Content:\n{request_content}\nResponse Content:\n{response_content}\n\n"
-            log_file.write(log_entry)
-    except Exception as e:
-        # Em caso de erro ao registrar o log, você pode optar por fazer algum tratamento específico ou simplesmente ignorá-lo.
-        pass
-
-
-
-# Cifra de Cesar
-
-def cifra(text):
-    shift = 22
-    encrypted_text = ""
-    for char in text:
-        if char.isalpha():
-            is_upper = char.isupper()
-            char = char.lower()
-            char_code = ord(char)
-            encrypted_char_code = ((char_code - ord('a') + shift) % 26) + ord('a') 
-            if is_upper:
-                encrypted_text += chr(encrypted_char_code).upper()
-            else:
-                encrypted_text += chr(encrypted_char_code)
-        else:
-            encrypted_text += char
-    return encrypted_text
-
-
-# Função enviar todo o banco de dados
-@app.route('/all_db', methods=['GET'])
-def enviar_db():
-    if not authenticate():
-        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-        return abort(401)
-
-    try:
-        # Conecte-se ao banco de dados SQLite 
-        conn = sqlite3.connect('openaai.db')
-        cursor = conn.cursor()
-
-        # Execute uma consulta para obter os dados do banco de dados (substitua com sua própria consulta)
-        cursor.execute("SELECT * FROM Clientes")
-        data = cursor.fetchall()
-
-        # Converta os dados em uma lista de dicionários
-        dados_json = []
-        for row in data:
-            dados_json.append({
-                "index": row[0],
-                "nome": row[1],
-                "numero": row[2],
-                "codClient": row[3],
-                "ConfirmouWP": row[4],
-                "ConfirmaEnvio": row[5],
-
-                # Adicione mais colunas conforme necessário
-            })
-
-        # Feche a conexão com o banco de dados
-        conn.close()
-        payload = {
-        'data': dados_json,
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
-        }
-        log_request(request, jsonify({'Payload': payload}))
-        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
-        secret_cifra = cifra(SECRET_KEY)
-        return jsonify({"mensagem": "Dados do banco de dados", "key": secret_cifra,"token": token}),200
-        
-    
-
-    except Exception as e:
-        return jsonify({"erro": "Erro ao processar dados do banco de dados", "mensagem": str(e)}), 400
-
-# Passar query --> Será desativada 
-@app.route('/query', methods=['POST'])
-def recebe_query():
-    if not authenticate():
-        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-        return abort(401)
-    try:
-        # Obtenha a consulta SQL do corpo da solicitação (POST)
-        query = request.get_data(as_text=True)
-        
-        print(f'Query = {query}')
-        
-        # Conecte-se ao banco de dados SQLite 
-        conn = sqlite3.connect('openaai.db')
-        cursor = conn.cursor()
-        
-        # Execute a consulta SQL
-        cursor.execute(query)
-        
-        # Se a consulta for uma consulta SELECT, você pode buscar os resultados
-        if query.strip().lower().startswith("select"):
-            data = cursor.fetchall()
-            # Converta os resultados em uma lista de dicionários (caso necessário)
-            results = [dict(zip([column[0] for column in cursor.description], row)) for row in data]
-        else:
-            results = None
-        
-        conn.commit()
-        conn.close()
-
-        # Envie os dados como resposta em formato JSON
-        #print(results)
-        
-        payload = {
-        'data': results,
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
-        }
-        log_request(request, jsonify({'Payload': payload}))
-        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
-        secret_cifra = cifra(SECRET_KEY)
-        return jsonify({"mensagem": "Dados do banco de dados", "key": secret_cifra,"token": token}),200
-        
-   
-
-    except Exception as e:
-        return jsonify({"erro": "Erro ao processar a consulta", "mensagem": str(e)}), 400
-
 
 
 # Função criar 
@@ -188,9 +58,9 @@ def criar_db():
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
-        secret_cifra = cifra(SECRET_KEY)
+        
         log_request(request, jsonify({'Payload': payload}))
-        return jsonify({"key": secret_cifra,"token": token}),200
+        return jsonify({"key": SECRET_KEY,"token": token}),200
         
 
     except Exception as e:
@@ -207,6 +77,10 @@ def novo_contato():
         log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
     try:
+        #t = threading.Thread(target=lambda: mail())
+        #t.mail()
+        
+        #mail()
         # Recebe os dados JSON da solicitação POST
         dados = request.get_json()
         print(f"Dados = {dados}")
@@ -239,12 +113,9 @@ def novo_contato():
         log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
-        secret_cifra = cifra(SECRET_KEY)
-        return jsonify({"key": secret_cifra,"token": token}),200
-        # Log da requisição e da resposta
-        log_request(request, jsonify({'message': 'Cliente adicionado com sucesso'}))
-        # Retorna uma resposta de sucesso
-        return jsonify({'message': 'Cliente adicionado com sucesso'}), 201
+        
+        return jsonify({"key": SECRET_KEY,"token": token}),200
+       
 
     except Exception as e:
         # Em caso de erro, retorna uma resposta de erro
@@ -275,9 +146,9 @@ def remove_registro():
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
-        secret_cifra = cifra(SECRET_KEY)
+       
         log_request(request, jsonify({'Payload': payload}))
-        return jsonify({"key": secret_cifra,"token": token}),200
+        return jsonify({"key": SECRET_KEY,"token": token}),200
        
     except Exception as e:
         # Em caso de erro, retorna uma resposta de erro
@@ -307,17 +178,14 @@ def update_id():
         'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
-        secret_cifra = cifra(SECRET_KEY)
+       
+        
         log_request(request, jsonify({'Payload': payload}))
-        return jsonify({"key": secret_cifra,"token": token}),200
+        return jsonify({"key": SECRET_KEY,"token": token}),200
         
     except Exception as e:
         # Em caso de erro, retorna uma resposta de erro
         return jsonify({'error': str(e)}), 400
-
-
-
 
 
 
@@ -340,10 +208,10 @@ def confirma_envio():
         'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
-        secret_cifra = cifra(SECRET_KEY)
+        
+       
         log_request(request, jsonify({'Payload': payload}))
-        return jsonify({"key": secret_cifra,"token": token}),200
+        return jsonify({"key": SECRET_KEY,"token": token}),200
         
     except Exception as e:
         # Em caso de erro, retorna uma resposta de erro
@@ -370,9 +238,8 @@ def delete_clientes():
         }
         log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
-        secret_cifra = cifra(SECRET_KEY)
-        return jsonify({"key": secret_cifra,"token": token}),200
+        
+        return jsonify({"key": SECRET_KEY,"token": token}),200
         
         # Retorna uma resposta de sucesso
         return jsonify({'message': 'Clientes deletados com sucesso'}), 201
@@ -406,9 +273,8 @@ def contar_clientes():
         }
         log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
-        secret_cifra = cifra(SECRET_KEY)
-        return jsonify({"key": secret_cifra,"token": token}),200
+        
+        return jsonify({"key": SECRET_KEY,"token": token}),200
        
 
 
@@ -444,8 +310,8 @@ def confirmaEqualNao():
             }
             token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
             log_request(request, jsonify({'Payload': payload}))
-            secret_cifra = cifra(SECRET_KEY)
-            return jsonify({"key": secret_cifra,"token": token}),200
+            
+            return jsonify({"key": SECRET_KEY,"token": token}),200
              
         payload = {
         'data': registro,
@@ -454,8 +320,7 @@ def confirmaEqualNao():
         log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
        
-        secret_cifra = cifra(SECRET_KEY)
-        return jsonify({"key": secret_cifra,"token": token}),200
+        return jsonify({"key": SECRET_KEY,"token": token}),200
 
 
     except Exception as e:
@@ -503,8 +368,8 @@ def new_user():
         }
         log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        secret_cifra = cifra(SECRET_KEY)
-        return jsonify({"key": secret_cifra,"token": token}),200
+        
+        return jsonify({"key": SECRET_KEY,"token": token}),200
 
         
 
@@ -537,8 +402,8 @@ def delete_user():
         }
         log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        secret_cifra = cifra(SECRET_KEY)
-        return jsonify({"key": secret_cifra,"token": token}),200
+        
+        return jsonify({"key": SECRET_KEY,"token": token}),200
        
     except Exception as e:
         # Em caso de erro, retorna uma resposta de erro
@@ -574,8 +439,8 @@ def update_password():
         }
         log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        secret_cifra = cifra(SECRET_KEY)
-        return jsonify({"key": secret_cifra,"token": token}),200
+        
+        return jsonify({"key": SECRET_KEY,"token": token}),200
 
        
 
@@ -613,8 +478,8 @@ def update_token():
         }
         log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        secret_cifra = cifra(SECRET_KEY)
-        return jsonify({"key": secret_cifra,"token": token}),200
+        
+        return jsonify({"key": SECRET_KEY,"token": token}),200
 
 
     except Exception as e:
@@ -637,8 +502,8 @@ def enviar_status():
         }
         log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        secret_cifra = cifra(SECRET_KEY)
-        return jsonify({"key": secret_cifra,"token": token}),200
+        
+        return jsonify({"key": SECRET_KEY,"token": token}),200
         
     except Exception as e:
         return jsonify({"erro": "Erro ao acessar dados"}), 400
@@ -671,12 +536,16 @@ def verificar_credenciais():
             # Credenciais corretas, gera um token JWT
             payload = {
                 "usuario": usuario[0],  # Assume que o primeiro campo é o ID do usuário
-                "email": email
-                # "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+                "email": email,
+                "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
             }
-            #token = jwt.encode(payload, chave_secreta, algorithm="HS256")
-            return jsonify({"mensagem": "Credenciais corretas", "token": payload}), 200
+            
+            token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+            log_request(request, jsonify({'Payload': payload}))
+
+            return jsonify({"key": SECRET_KEY,"mensagem": "Credenciais corretas", "token": token}), 200
         else:
+            log_request(request, jsonify({'Payload': payload}))
             return jsonify({"mensagem": "Credenciais incorretas"}), 401
  
     except Exception as e:
@@ -684,6 +553,11 @@ def verificar_credenciais():
             jsonify({"erro": "Erro ao verificar as credenciais", "mensagem": str(e)}),
             500,
         )
+
+
+@app.route("/template")
+def index():
+  return render_template('index.html')
 
 
 

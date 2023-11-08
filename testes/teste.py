@@ -3,6 +3,8 @@ import json
 import jwt
 # Decifra cifra da Key
 def cifra(text):
+    print("entoru cifra")
+    print(text)
     # Casas a mover
     shift = 22
     decrypted_text = ""
@@ -93,9 +95,14 @@ def inserir_dados():
 
     # Enviando a solicitação POST
     response = requests.post(api_url, headers=headers, json=data)
+    print("Response")
+    print(response)
     segredo = response.json()
     data = segredo.get("token")
+    print(data)
+
     segredo = segredo.get("key")
+    print(segredo)
     segredo = cifra(segredo)
     # Descriptografe o token usando a mesma chave secreta
     dados = jwt.decode(data, segredo, algorithms=['HS256'])

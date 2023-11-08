@@ -37,10 +37,10 @@ def caesar_cipher(text):
 # Exemplo de uso:
 plaintext = "CG1hUuCabtbNY1DSBaLUOhug5KRkxS66NtNQ9N9tIAw"
 #shift_amount = 22
-encrypted_text = caesar_cipher(plaintext, shift_amount)
+encrypted_text = caesar_cipher(plaintext)
 print(f"Texto original: {plaintext}")
 print(f"Texto criptografado: {encrypted_text}")
 
-decrypted_text = caesar_decipher(encrypted_text, shift_amount)
+decrypted_text = caesar_decipher(encrypted_text)
 
 print(f"Descriptogradafo : {decrypted_text}")

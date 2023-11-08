@@ -1,4 +1,8 @@
-/__pycache
+/__pycache__
 *.db
 /API em NODE
 srs.json
+/.vscode
+./__pycache__
+.db
+openaai.db
