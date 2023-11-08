@@ -1,5 +1,8 @@
 const jwt = require('jsonwebtoken');
 
+
+// Ignore a função cifra, será substituida por outro metodo de criptografia
+
 function cifra(text) {
     const shift = 22;
     let decrypted_text = "";
@@ -22,8 +25,8 @@ function cifra(text) {
   
 
 
-//console.log("Entrou criar usuário");
 
+// Exemplo de requisição
 const apiUrl = 'http://127.0.0.1:5000/verificar_credenciais'; // Substitua pela URL da sua API
 const contentType = 'application/json'; // Tipo de conteúdo apropriado para a sua API
 
@@ -32,7 +35,7 @@ const contentType = 'application/json'; // Tipo de conteúdo apropriado para a s
 const data = {
     email: 'ronaldo.lazzari@messeminvestimentos.com.br',
    
-    senha: 'perfil_desejado'
+    senha: 'senha do ronaldo'
     
 };
 

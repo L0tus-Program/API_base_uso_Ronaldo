@@ -132,3 +132,94 @@ Response Content:
 }
 
 
+08-11-2023 11:26:30 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "message": "Banco de dados Criado com Sucesso"
+}
+
+
+08-11-2023 11:26:30 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "Payload": {
+    "data": "Banco de dados criado com sucesso",
+    "exp": "Thu, 09 Nov 2023 14:26:30 GMT"
+  }
+}
+
+
+08-11-2023 11:28:15 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "message": "Banco de dados Criado com Sucesso"
+}
+
+
+08-11-2023 11:28:15 - IP: 127.0.0.1
+Request Content:
+
+Response Content:
+{
+  "Payload": {
+    "data": "Banco de dados criado com sucesso",
+    "exp": "Thu, 09 Nov 2023 14:28:15 GMT"
+  }
+}
+
+
+08-11-2023 11:28:48 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "21", "numero": "21", "codClient": "23", "ConfirmouWP": "23", "ConfirmaEnvio": "21", "enviar": 1}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente adicionado com sucesso",
+    "exp": "Thu, 09 Nov 2023 14:28:48 GMT"
+  }
+}
+
+
+08-11-2023 11:29:43 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente adicionado com sucesso",
+    "exp": "Thu, 09 Nov 2023 14:29:43 GMT"
+  }
+}
+
+
+08-11-2023 11:37:32 - IP: 127.0.0.1
+Request Content:
+{"email": "ronaldo.lazzari@messeminvestimentos.com.br", "perfil": "admin", "senha": "senha do ronaldo", "token": "1234"}
+Response Content:
+{
+  "Payload": {
+    "data": "User adicionado com sucesso",
+    "exp": "Thu, 09 Nov 2023 14:37:32 GMT"
+  }
+}
+
+
+08-11-2023 11:37:47 - IP: 127.0.0.1
+Request Content:
+{"email":"ronaldo.lazzari@messeminvestimentos.com.br","senha":"senha do ronaldo"}
+Response Content:
+{
+  "Payload": {
+    "email": "ronaldo.lazzari@messeminvestimentos.com.br",
+    "exp": "Thu, 09 Nov 2023 14:37:47 GMT",
+    "usuario": 1
+  }
+}
+
+

@@ -103,7 +103,7 @@ def inserir_dados():
 
     segredo = segredo.get("key")
     print(segredo)
-    segredo = cifra(segredo)
+    #segredo = cifra(segredo)
     # Descriptografe o token usando a mesma chave secreta
     dados = jwt.decode(data, segredo, algorithms=['HS256'])
     print(dados)
