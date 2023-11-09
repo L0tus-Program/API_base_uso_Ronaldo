@@ -1,10 +1,6 @@
-import pandas as pd
+# import pandas as pd
 from datetime import datetime, timedelta
 import sqlite3
-
-
-
-
 
 
 def criar_login():
@@ -19,7 +15,7 @@ def criar_login():
         token TEXT
     )
     '''
- 
+
     # Executar o comando SQL para criar a tabela
     cursor.execute(create_table_query)
     conn.commit()
@@ -48,7 +44,6 @@ def criar_db_sqlite():
         enviar INTEGER CHECK (enviar IN (0, 1))
     )
     '''
-    
 
     # Executar o comando SQL para criar a tabela
     cursor.execute(create_table_query)
@@ -56,9 +51,6 @@ def criar_db_sqlite():
     conn.close()
 
 
-#criar_db_sqlite()
+# criar_db_sqlite()
 
-#criar_login()
-
-
-
+# criar_login()

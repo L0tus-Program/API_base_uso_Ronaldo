@@ -6,3 +6,5 @@ srs.json
 ./__pycache__
 .db
 openaai.db
+/node_modules
+testes/node_modules

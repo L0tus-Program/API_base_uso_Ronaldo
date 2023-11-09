@@ -1,13 +1,13 @@
-from flask import Flask, request, jsonify, abort,render_template
+from flask import Flask, request, jsonify, abort, render_template
 from flask_cors import CORS
 import db
 import sqlite3
-import json 
+import json
 import datetime
 import secrets
 import jwt
-from utils import *
-import threading
+from utils import log_request
+# import threading
 
 # Abra o arquivo JSON
 with open('src.json', 'r') as file:
@@ -29,9 +29,11 @@ PORT = 5000
 
 # Criando aplicação
 app = Flask(__name__)
-CORS(app) # Quando subir pra VPS, configurar domínios que podem acessar
+CORS(app)  # Quando subir pra VPS, configurar domínios que podem acessar
 
 # Autenticação
+
+
 def authenticate():
     api_key = request.headers.get('X-API-KEY')
     print(api_key)
@@ -42,31 +44,79 @@ def authenticate():
         return True
 
 
-# Função criar 
-@app.route('/create_db',methods=['POST'] )
+# Função enviar todo o banco de dados
+@app.route('/all_db', methods=['GET'])
+def enviar_db():
+    if not authenticate():
+        log_request(request, jsonify(
+            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+        return abort(401)
+
+    try:
+        # Conecte-se ao banco de dados SQLite
+        conn = sqlite3.connect('openaai.db')
+        cursor = conn.cursor()
+
+        # Execute uma consulta para obter os dados do banco de dados (substitua com sua própria consulta)
+        cursor.execute("SELECT * FROM Clientes")
+        data = cursor.fetchall()
+
+        # Converta os dados em uma lista de dicionários
+        dados_json = []
+        for row in data:
+            dados_json.append({
+                "index": row[0],
+                "nome": row[1],
+                "numero": row[2],
+                "codClient": row[3],
+                "ConfirmouWP": row[4],
+                "ConfirmaEnvio": row[5],
+
+                # Adicione mais colunas conforme necessário
+            })
+
+        # Feche a conexão com o banco de dados
+        conn.close()
+        payload = {
+            'data': dados_json,
+            # tempo de expiração do token
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
+        }
+        log_request(request, jsonify({'Payload': payload}))
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        # return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
+
+        return jsonify({"mensagem": "Dados do banco de dados", "key": SECRET_KEY, "token": token}), 200
+
+    except Exception as e:
+        return jsonify({"erro": "Erro ao processar dados do banco de dados", "mensagem": str(e)}), 400
+
+
+# Função criar
+@app.route('/create_db', methods=['POST'])
 def criar_db():
     if not authenticate():
-        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+        log_request(request, jsonify(
+            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
     try:
         db.criar_db_sqlite()
         db.criar_login()
-        log_request(request, jsonify({'message': 'Banco de dados Criado com Sucesso'}))
+        log_request(request, jsonify(
+            {'message': 'Banco de dados Criado com Sucesso'}))
         payload = {
-        'data': "Banco de dados criado com sucesso",
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+            'data': "Banco de dados criado com sucesso",
+            # tempo de expiração do token
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
-        
+        # return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
+
         log_request(request, jsonify({'Payload': payload}))
-        return jsonify({"key": SECRET_KEY,"token": token}),200
-        
+        return jsonify({"key": SECRET_KEY, "token": token}), 200
 
     except Exception as e:
         return jsonify({"erro": "Erro ao processar banco de dados", "mensagem": str(e)}), 400
-
-
 
 
 # Cadastrar novo contato
@@ -74,13 +124,14 @@ def criar_db():
 def novo_contato():
     global SECRET_KEY
     if not authenticate():
-        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+        log_request(request, jsonify(
+            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
     try:
-        #t = threading.Thread(target=lambda: mail())
-        #t.mail()
-        
-        #mail()
+        # t = threading.Thread(target=lambda: mail())
+        # t.mail()
+
+        # mail()
         # Recebe os dados JSON da solicitação POST
         dados = request.get_json()
         print(f"Dados = {dados}")
@@ -100,35 +151,74 @@ def novo_contato():
 
         # Executa a query SQL para inserir um novo cliente na tabela
         query = "INSERT INTO clientes (id, nome, numero, codClient, ConfirmouWP, ConfirmaEnvio, enviar) VALUES (?, ?, ?, ?, ?, ?, ?)"
-        cursor.execute(query, (id, nome, numero, codClient, ConfirmouWP, ConfirmaEnvio, enviar))
+        cursor.execute(query, (id, nome, numero, codClient,
+                       ConfirmouWP, ConfirmaEnvio, enviar))
 
         # Comita a transação e fecha a conexão com o banco de dados
         conn.commit()
         conn.close()
-        
+
         payload = {
-        'data': "Cliente adicionado com sucesso",
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+            'data': "Cliente adicionado com sucesso",
+            # tempo de expiração do token
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
         }
         log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
-        
-        return jsonify({"key": SECRET_KEY,"token": token}),200
-       
+        # return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
+
+        return jsonify({"key": SECRET_KEY, "token": token}), 200
 
     except Exception as e:
         # Em caso de erro, retorna uma resposta de erro
         return jsonify({'error': str(e)}), 400
 
 
+# Consulta pelo ID
+@app.route('/consultar_cliente/<int:cliente_id>', methods=['GET'])
+def consulta(cliente_id):
+    if not authenticate():
+        log_request(request, jsonify(
+            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+        return abort(401)
+    try:
+        conn = sqlite3.connect('openaai.db')
+        cursor = conn.cursor()
+        # Corrigindo a consulta SQL para selecionar o cliente com base no ID
+        query = "SELECT * FROM clientes WHERE id = ?"
+
+        # Execute a consulta SQL
+        cursor.execute(query, (cliente_id,))
+
+        # Obtenha os resultados da consulta
+        cliente = cursor.fetchone()
+
+        conn.close()
+
+        if cliente is None:
+            return jsonify({'message': 'Cliente não encontrado'}), 404
+
+        payload = {
+            'data': "Cliente consultado com sucesso",
+            'resultado': cliente,
+            # tempo de expiração do token
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+
+        log_request(request, jsonify({'Payload': payload}))
+        return jsonify({"key": SECRET_KEY, "token": token, "cliente": cliente}), 200
+    except Exception as e:
+        # Em caso de erro, retorna uma resposta de erro
+        return jsonify({'error': str(e)}), 400
 
 
 # Remover pelo ID
 @app.route('/remove_registro', methods=['POST'])
 def remove_registro():
     if not authenticate():
-        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+        log_request(request, jsonify(
+            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
     try:
         dados = request.get_data(as_text=True)
@@ -141,27 +231,27 @@ def remove_registro():
         conn.commit()
         conn.close()
         payload = {
-        'data': "Cliente removido com sucesso",
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+            'data': "Cliente removido com sucesso",
+            # tempo de expiração do token
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        #return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
-       
+        # return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
+
         log_request(request, jsonify({'Payload': payload}))
-        return jsonify({"key": SECRET_KEY,"token": token}),200
-       
+        return jsonify({"key": SECRET_KEY, "token": token}), 200
+
     except Exception as e:
         # Em caso de erro, retorna uma resposta de erro
         return jsonify({'error': str(e)}), 400
 
 
-
-
 # Update pelo ID
-@app.route('/update', methods = ['POST'])
+@app.route('/update', methods=['POST'])
 def update_id():
     if not authenticate():
-        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+        log_request(request, jsonify(
+            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
     try:
         dados = request.get_data(as_text=True)
@@ -170,30 +260,31 @@ def update_id():
         cursor = conn.cursor()
         query = "UPDATE clientes SET nome = ?, numero = ?, ConfirmouWP = ?, ConfirmaEnvio = ? WHERE id = ?"
         # Execute a consulta SQL
-        cursor.execute(query,(dados['nome'], dados['numero'], dados['ConfirmouWP'], dados['ConfirmaEnvio'], dados['id']))
+        cursor.execute(query, (dados['nome'], dados['numero'],
+                       dados['ConfirmouWP'], dados['ConfirmaEnvio'], dados['id']))
         conn.commit()
         conn.close()
         payload = {
-        'data': "Cliente atualizado com sucesso",
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+            'data': "Cliente atualizado com sucesso",
+            # tempo de expiração do token
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-       
-        
+
         log_request(request, jsonify({'Payload': payload}))
-        return jsonify({"key": SECRET_KEY,"token": token}),200
-        
+        return jsonify({"key": SECRET_KEY, "token": token}), 200
+
     except Exception as e:
         # Em caso de erro, retorna uma resposta de erro
         return jsonify({'error': str(e)}), 400
 
 
-
 # Update confirma envio = Nao
-@app.route('/confirma_envio', methods = ['POST'])
+@app.route('/confirma_envio', methods=['POST'])
 def confirma_envio():
     if not authenticate():
-        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+        log_request(request, jsonify(
+            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
     try:
         conn = sqlite3.connect('openaai.db')
@@ -204,25 +295,26 @@ def confirma_envio():
         conn.commit()
         conn.close()
         payload = {
-        'data': "Clientes adicionados com sucesso",
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+            'data': "Clientes adicionados com sucesso",
+            # tempo de expiração do token
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        
-       
+
         log_request(request, jsonify({'Payload': payload}))
-        return jsonify({"key": SECRET_KEY,"token": token}),200
-        
+        return jsonify({"key": SECRET_KEY, "token": token}), 200
+
     except Exception as e:
         # Em caso de erro, retorna uma resposta de erro
         return jsonify({'error': str(e)}), 400
 
 
 # Deleta TODOS os clientes
-@app.route('/delete_clientes', methods = ['POST'])
+@app.route('/delete_clientes', methods=['POST'])
 def delete_clientes():
     if not authenticate():
-        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+        log_request(request, jsonify(
+            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
     try:
         conn = sqlite3.connect('openaai.db')
@@ -233,30 +325,30 @@ def delete_clientes():
         conn.commit()
         conn.close()
         payload = {
-        'data': "Clientes deletados com sucesso",
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+            'data': "Clientes deletados com sucesso",
+            # tempo de expiração do token
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
         }
         log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        
-        return jsonify({"key": SECRET_KEY,"token": token}),200
-        
-        # Retorna uma resposta de sucesso
-        return jsonify({'message': 'Clientes deletados com sucesso'}), 201
+
+        return jsonify({"key": SECRET_KEY, "token": token}), 200
+
     except Exception as e:
         # Em caso de erro, retorna uma resposta de erro
         return jsonify({'error': str(e)}), 400
 
 
 # Contar todos os clientes
-@app.route('/contar_clientes', methods = ['GET'])
+@app.route('/contar_clientes', methods=['GET'])
 def contar_clientes():
     if not authenticate():
-        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-        
+        log_request(request, jsonify(
+            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+
         return abort(401)
     try:
-        # Conecte-se ao banco de dados SQLite 
+        # Conecte-se ao banco de dados SQLite
         conn = sqlite3.connect('openaai.db')
         cursor = conn.cursor()
 
@@ -268,34 +360,34 @@ def contar_clientes():
         # Feche a conexão com o banco de dados
         conn.close()
         payload = {
-        'data': contador,
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+            'data': contador,
+            # tempo de expiração do token
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
         }
         log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        
-        return jsonify({"key": SECRET_KEY,"token": token}),200
-       
 
+        return jsonify({"key": SECRET_KEY, "token": token}), 200
 
     except Exception as e:
         return jsonify({"erro": "Erro ao contar clientes", "mensagem": str(e)}), 400
 
 
-
 # Retornar primeiro cliente com ConfirmaEnvio = não
-@app.route('/confirmaEqualNao', methods = ['GET'])
+@app.route('/confirmaEqualNao', methods=['GET'])
 def confirmaEqualNao():
     if not authenticate():
-        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+        log_request(request, jsonify(
+            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
     try:
-        # Conecte-se ao banco de dados SQLite 
+        # Conecte-se ao banco de dados SQLite
         conn = sqlite3.connect('openaai.db')
         cursor = conn.cursor()
 
         # Execute uma consulta para obter os dados do banco de dados (substitua com sua própria consulta)
-        cursor.execute("SELECT * FROM Clientes WHERE ConfirmaEnvio = 'nao' ORDER BY id DESC LIMIT 1")
+        cursor.execute(
+            "SELECT * FROM Clientes WHERE ConfirmaEnvio = 'nao' ORDER BY id DESC LIMIT 1")
         # Recupere o valor do contador
         registro = cursor.fetchone()
 
@@ -305,37 +397,37 @@ def confirmaEqualNao():
         # Envie os dados como resposta em formato JSON
         if registro is None:
             payload = {
-            'data': "Nenhum cliente encontrado",
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+                'data': "Nenhum cliente encontrado",
+                # tempo de expiração do token
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
             }
             token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
             log_request(request, jsonify({'Payload': payload}))
-            
-            return jsonify({"key": SECRET_KEY,"token": token}),200
-             
+
+            return jsonify({"key": SECRET_KEY, "token": token}), 200
+
         payload = {
-        'data': registro,
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+            'data': registro,
+            # tempo de expiração do token
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
         }
         log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-       
-        return jsonify({"key": SECRET_KEY,"token": token}),200
 
+        return jsonify({"key": SECRET_KEY, "token": token}), 200
 
     except Exception as e:
         return jsonify({"erro": "Erro ao contar clientes", "mensagem": str(e)}), 400
 
 
+# Cria um novo user
 
-
-#Cria um novo user
-
-@app.route('/new_user', methods = ['POST'])
+@app.route('/new_user', methods=['POST'])
 def new_user():
-    
+
     if not authenticate():
-        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+        log_request(request, jsonify(
+            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
     try:
         # Recebe os dados JSON da solicitação POST
@@ -343,47 +435,44 @@ def new_user():
         print(f"Dados = {dados}")
 
         # Extrai os campos necessários do JSON
-       
+
         email = dados['email']
         perfil = dados['perfil']
         senha = dados['senha']
         token = dados['token']
-        
 
         # Conecta-se ao banco de dados
         conn = sqlite3.connect('openaai.db')
         cursor = conn.cursor()
 
-        
         # Executa a query SQL para inserir um novo usuário na tabela
         query = "INSERT INTO users (email, perfil,senha, token) VALUES (?, ?, ?, ?)"
-        cursor.execute(query, (email, perfil,senha, token))
+        cursor.execute(query, (email, perfil, senha, token))
 
         # Comita a transação e fecha a conexão com o banco de dados
         conn.commit()
         conn.close()
         payload = {
-        'data': "User adicionado com sucesso",
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+            'data': "User adicionado com sucesso",
+            # tempo de expiração do token
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
         }
         log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        
-        return jsonify({"key": SECRET_KEY,"token": token}),200
 
-        
+        return jsonify({"key": SECRET_KEY, "token": token}), 200
 
     except Exception as e:
         # Em caso de erro, retorna uma resposta de erro
         return jsonify({'error': str(e)}), 400
 
 
-
 # Remover usuário pelo email
 @app.route('/delete_user', methods=['POST'])
 def delete_user():
     if not authenticate():
-        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+        log_request(request, jsonify(
+            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
     try:
         dados = request.get_data(as_text=True)
@@ -397,14 +486,15 @@ def delete_user():
         conn.commit()
         conn.close()
         payload = {
-        'data': "User removido com sucesso",
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+            'data': "User removido com sucesso",
+            # tempo de expiração do token
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
         }
         log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        
-        return jsonify({"key": SECRET_KEY,"token": token}),200
-       
+
+        return jsonify({"key": SECRET_KEY, "token": token}), 200
+
     except Exception as e:
         # Em caso de erro, retorna uma resposta de erro
         return jsonify({'error': str(e)}), 400
@@ -414,7 +504,8 @@ def delete_user():
 @app.route('/update_password', methods=['POST'])
 def update_password():
     if not authenticate():
-        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+        log_request(request, jsonify(
+            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
     try:
         # Recebe o email e a nova senha do usuário a ser atualizada no corpo da solicitação POST
@@ -434,15 +525,14 @@ def update_password():
         conn.commit()
         conn.close()
         payload = {
-        'data': "Senha atualizada com sucesso",
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+            'data': "Senha atualizada com sucesso",
+            # tempo de expiração do token
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
         }
         log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        
-        return jsonify({"key": SECRET_KEY,"token": token}),200
 
-       
+        return jsonify({"key": SECRET_KEY, "token": token}), 200
 
     except Exception as e:
         # Em caso de erro, retorna uma resposta de erro
@@ -453,7 +543,8 @@ def update_password():
 @app.route('/update_token', methods=['POST'])
 def update_token():
     if not authenticate():
-        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+        log_request(request, jsonify(
+            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
     try:
         # Recebe o email e o novo token do usuário a ser atualizado no corpo da solicitação POST
@@ -473,19 +564,18 @@ def update_token():
         conn.commit()
         conn.close()
         payload = {
-        'data': "Token atualizado com sucesso",
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+            'data': "Token atualizado com sucesso",
+            # tempo de expiração do token
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
         }
         log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        
-        return jsonify({"key": SECRET_KEY,"token": token}),200
 
+        return jsonify({"key": SECRET_KEY, "token": token}), 200
 
     except Exception as e:
         # Em caso de erro, retorna uma resposta de erro
         return jsonify({'error': str(e)}), 400
-
 
 
 # Conferir API online
@@ -493,22 +583,26 @@ def update_token():
 @app.route('/', methods=['GET'])
 def enviar_status():
     if not authenticate():
-        log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+        log_request(request, jsonify(
+            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
     try:
         payload = {
-        'data': "API online.", "GPT": "Status - OK",
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+            'data': "API online.", "GPT": "Status - OK",
+            # tempo de expiração do token
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
         }
         log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        
-        return jsonify({"key": SECRET_KEY,"token": token}),200
-        
+
+        return jsonify({"key": SECRET_KEY, "token": token}), 200
+
     except Exception as e:
-        return jsonify({"erro": "Erro ao acessar dados"}), 400
+        return jsonify({"erro": "Erro ao acessar dados", "Error": str(e)}), 400
 
 # Rota para verificar as credenciais
+
+
 @app.route("/verificar_credenciais", methods=["POST"])
 def verificar_credenciais():
     if not authenticate():
@@ -518,51 +612,50 @@ def verificar_credenciais():
         data = request.get_json()
         email = data.get("email")
         senha = data.get("senha")
- 
+
         # Conecte-se ao banco de dados SQLite
         conn = sqlite3.connect("openaai.db")
         cursor = conn.cursor()
- 
+
         # Execute uma consulta para verificar as credenciais (substitua com sua própria consulta)
         cursor.execute(
             "SELECT * FROM users WHERE email = ? AND senha = ?", (email, senha)
         )
         usuario = cursor.fetchone()
- 
+
         # Feche a conexão com o banco de dados
         conn.close()
- 
+
         if usuario:
             # Credenciais corretas, gera um token JWT
             payload = {
-                "usuario": usuario[0],  # Assume que o primeiro campo é o ID do usuário
+                # Assume que o primeiro campo é o ID do usuário
+                "usuario": usuario[0],
                 "email": email,
-                "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1)  # tempo de expiração do token
+                # tempo de expiração do token
+                "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1)
             }
-            
+
             token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
             log_request(request, jsonify({'Payload': payload}))
 
-            return jsonify({"key": SECRET_KEY,"mensagem": "Credenciais corretas", "token": token}), 200
+            return jsonify({"key": SECRET_KEY, "mensagem": "Credenciais corretas", "token": token}), 200
         else:
             log_request(request, jsonify({'Payload': payload}))
             return jsonify({"mensagem": "Credenciais incorretas"}), 401
- 
+
     except Exception as e:
         return (
-            jsonify({"erro": "Erro ao verificar as credenciais", "mensagem": str(e)}),
+            jsonify(
+                {"erro": "Erro ao verificar as credenciais", "mensagem": str(e)}),
             500,
         )
 
 
 @app.route("/template")
 def index():
-  return render_template('index.html')
-
+    return render_template('index.html')
 
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
