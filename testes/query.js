@@ -1,18 +1,15 @@
 const jwt = require('jsonwebtoken');
-
+//62.72.63.140:5000
+//127.0.0.1:5000
 // Exemplo de requisição
-const apiUrl = 'http://127.0.0.1:5000/novo_contato';
+const apiUrl = 'http://62.72.63.140:5000/verificar_credenciais';
 const contentType = 'application/json';
 
 //Corpo da solicitação com os valores coletados, incluindo a senha da API
 const data = {
-    id: "id",
-    nome: "nome",
-    numero: "numero",
-    codClient: "codClient",
-    ConfirmouWP: "ConfirmouWP",
-    ConfirmaEnvio: "ConfirmaEnvio",
-    enviar: "1"
+    email: "ronaldo.lazzari@messeminvestimentos.com.br",
+    senha: "senha do ronaldo",
+    
 };
 
 

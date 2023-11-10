@@ -4,6 +4,7 @@
 srs.json
 /.vscode
 ./__pycache__
+*./__pycache__
 .db
 openaai.db
 /node_modules

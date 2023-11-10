@@ -53,9 +53,6 @@ def secret():
         print('Resposta da API:', response.text)
 
 
-secret_key = secret()
-print(secret_key)
-
 
 def inserir_dados():
     # Dados da solicitação POST
@@ -489,7 +486,7 @@ def all_db():
 
 
 while True:
-    menu = input("1 - Inserir dados\n2 - Deletar dados\n4 - Contar clientes\n5 - Criar DB\n6 - Inserir USER\n7 - Delete user\n8 - Altera senha USER\n9 - Update token\n10 - Consultar cliente pelo id\n0 - SAIR\n")
+    menu = input("1 - Inserir dados\n2 - Deletar dados\n4 - Contar clientes\n5 - Criar DB\n6 - Inserir USER\n7 - Delete user\n8 - Altera senha USER\n9 - Update token\n10 - Consultar cliente pelo id\n11 - all db\n0 - SAIR\n")
     match menu:
         case '1':
             inserir_dados()

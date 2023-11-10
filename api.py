@@ -619,10 +619,10 @@ def verificar_credenciais():
 
         # Execute uma consulta para verificar as credenciais (substitua com sua própria consulta)
         cursor.execute(
-            "SELECT * FROM users WHERE email = ? AND senha = ?", (email, senha)
+            "SELECT * FROM users WHERE email = ? AND senha = ? ", (email, senha)
         )
         usuario = cursor.fetchone()
-
+    
         # Feche a conexão com o banco de dados
         conn.close()
 
@@ -632,6 +632,7 @@ def verificar_credenciais():
                 # Assume que o primeiro campo é o ID do usuário
                 "usuario": usuario[0],
                 "email": email,
+                "token": usuario[4],
                 # tempo de expiração do token
                 "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1)
             }

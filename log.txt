@@ -223,3 +223,84 @@ Response Content:
 }
 
 
+10-11-2023 15:02:05 - IP: 127.0.0.1
+Request Content:
+{"email":"ronaldo.lazzari@messeminvestimentos.com.br","senha":"senha do ronaldo"}
+Response Content:
+{
+  "Payload": {
+    "email": "ronaldo.lazzari@messeminvestimentos.com.br",
+    "exp": "Sat, 11 Nov 2023 18:02:05 GMT",
+    "usuario": 1
+  }
+}
+
+
+10-11-2023 15:02:38 - IP: 127.0.0.1
+Request Content:
+{"email":"ronaldo.lazzari@messeminvestimentos.com.br","senha":"senha do ronaldo"}
+Response Content:
+{
+  "Payload": {
+    "email": "ronaldo.lazzari@messeminvestimentos.com.br",
+    "exp": "Sat, 11 Nov 2023 18:02:38 GMT",
+    "usuario": 1
+  }
+}
+
+
+10-11-2023 15:03:35 - IP: 127.0.0.1
+Request Content:
+{"email":"ronaldo.lazzari@messeminvestimentos.com.br","senha":"senha do ronaldo"}
+Response Content:
+{
+  "Payload": {
+    "email": "ronaldo.lazzari@messeminvestimentos.com.br",
+    "exp": "Sat, 11 Nov 2023 18:03:35 GMT",
+    "usuario": 1
+  }
+}
+
+
+10-11-2023 15:04:38 - IP: 127.0.0.1
+Request Content:
+{"email":"ronaldo.lazzari@messeminvestimentos.com.br","senha":"senha do ronaldo"}
+Response Content:
+{
+  "Payload": {
+    "email": "ronaldo.lazzari@messeminvestimentos.com.br",
+    "exp": "Sat, 11 Nov 2023 18:04:38 GMT",
+    "token": "1234",
+    "usuario": 1
+  }
+}
+
+
+10-11-2023 15:04:46 - IP: 127.0.0.1
+Request Content:
+{"email":"ronaldo.lazzari@messeminvestimentos.com.br","senha":"senha do ronaldo"}
+Response Content:
+{
+  "Payload": {
+    "email": "ronaldo.lazzari@messeminvestimentos.com.br",
+    "exp": "Sat, 11 Nov 2023 18:04:46 GMT",
+    "token": "1234",
+    "usuario": 1
+  }
+}
+
+
+10-11-2023 15:15:33 - IP: 127.0.0.1
+Request Content:
+{"email":"ronaldo.lazzari@messeminvestimentos.com.br","senha":"senha do ronaldo"}
+Response Content:
+{
+  "Payload": {
+    "email": "ronaldo.lazzari@messeminvestimentos.com.br",
+    "exp": "Sat, 11 Nov 2023 18:15:33 GMT",
+    "token": "1234",
+    "usuario": 1
+  }
+}
+
+

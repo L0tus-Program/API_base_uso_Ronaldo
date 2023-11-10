@@ -81,3 +81,9 @@ A API estará disponível em http://localhost:5000. OU outro ip/porta que você 
 ## Contribuindo
 
 Sinta-se à vontade para contribuir para este projeto. Você pode abrir problemas, enviar solicitações de pull e melhorar a documentação.
+
+
+## Possíveis implementações
+
+- Flask-Login -> Para melhor gerenciamento de logins em seções -> https://flask-login.readthedocs.io/en/latest/
+- Flask-RESTful -> Para melhor organização das requisições -> https://flask-restful.readthedocs.io/en/latest/
