@@ -56,19 +56,18 @@ def secret():
 
 def inserir_dados():
     # Dados da solicitação POST
-    api_url = 'http://62.72.63.140:5000/novo_contato'  # Substitua pela URL da sua API
+    api_url = 'https://flow.zoho.com/815771232/flow/webhook/incoming?zapikey=1001.238f6eed017e6543075b778f14d4b4dc.7671b2f32f9e9c80bd3ae62688f5467e&isdebug=false'  # Substitua pela URL da sua API
     content_type = 'application/json'  # Tipo de conteúdo apropriado para a sua API
-    # sql_query = 'SELECT * FROM Clientes'  # Sua consulta SQL
-    api_key = "F14C7D7625414A3E5DA1811349667"
+ 
 
     # Cabeçalho da solicitação
     headers = {
-        'Content-Type': content_type,
-        'X-API-KEY': str(api_key)
+        'Content-Type': content_type
+        
     }
 
     # Corpo da solicitação
-    # data = sql_query
+ 
 
     id = input("Insira o ID : ")
     nome = input("Insira o nome : ")
@@ -90,7 +89,7 @@ def inserir_dados():
     }
 
     # Enviando a solicitação POST
-    response = requests.post(api_url, headers=headers, json=data)
+    response = requests.post(api_url,json=data)
     print("Response")
     print(response)
     segredo = response.json()
@@ -99,13 +98,13 @@ def inserir_dados():
 
     segredo = segredo.get("key")
     print(segredo)
-    # segredo = cifra(segredo)
+   
     # Descriptografe o token usando a mesma chave secreta
     dados = jwt.decode(data, segredo, algorithms=['HS256'])
     print(dados)
-    """
-    # Enviando a solicitação POST
-    response = requests.post(api_url, headers=headers, json=data_json)"""
+    
+  
+   
 
     # Verificando a resposta
     if response.status_code == 200:

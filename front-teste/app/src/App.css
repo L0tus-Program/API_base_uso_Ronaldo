@@ -1,20 +1,33 @@
+.icons{
+  width: 52pt;
+  height: auto;
+  
+}
+
+
+
+
 .App {
   text-align: center;
 }
 
+
+
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
+  color: #61dafb;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+    animation: pulse infinite 2s ease-in-out;
   }
 }
 
-.App-header {
-  background-color: #282c34;
+.App-section {
+  background: linear-gradient(#023396,#0d3d9cdc,#123477); 
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -28,11 +41,35 @@
   color: #61dafb;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
   }
-  to {
-    transform: rotate(360deg);
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
   }
 }
+
+
+.particle-canvas{
+  z-index: -10;
+}
+/*
+@keyframes App-logo-spin {
+  from {
+   
+    perspective: 1000px;
+    width: 150px;
+    height: auto;
+  }
+  to {
+    perspective: 600px;
+    
+    width: 200px;
+    height: auto;
+  }
+}*/
