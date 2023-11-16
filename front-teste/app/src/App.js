@@ -51,7 +51,7 @@ function App() {
             console.log("logou");
             alert("Logou");
           }
-          
+
         } catch (error) {
           alert("Deu merda, senha errada");
         }
@@ -76,7 +76,7 @@ function App() {
         <p>
           Use e abuse da API porque não tem ninguém olhando. Isso é só um teste mesmo
         </p>
-        <a href='https://github.com/L0tus-Program/API_base_uso_Ronaldo' target='_blank' rel="noreferrer"><img src={github} className='icons' alt="logo" /></a>
+        <a href='https://github.com/L0tus-Program/API_base_uso_Ronaldo' target='_blank' rel="noreferrer"><img src={github} className='icons' alt="github" /></a>
       </section>
     </div>
   );

@@ -1,7 +1,7 @@
-.icons{
+.icons {
   width: 52pt;
   height: auto;
-  
+
 }
 
 
@@ -18,16 +18,18 @@
   height: 40vmin;
   pointer-events: none;
   color: #61dafb;
+  animation: pulse infinite 4s ease-in-out;
 }
 
+/*
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
-    animation: pulse infinite 2s ease-in-out;
+    animation: App-logo-spin infinite 10s ease-in-out;
   }
 }
-
+*/
 .App-section {
-  background: linear-gradient(#023396,#0d3d9cdc,#123477); 
+  background: linear-gradient(#023396, #0d3d9cdc, #123477);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -46,30 +48,33 @@
   0% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.1);
   }
+
   100% {
     transform: scale(1);
   }
 }
 
 
-.particle-canvas{
+.particle-canvas {
   z-index: -10;
 }
-/*
+
 @keyframes App-logo-spin {
+
   from {
-   
-    perspective: 1000px;
-    width: 150px;
-    height: auto;
+
+    transform: rotate(0deg);
+
   }
+
   to {
-    perspective: 600px;
-    
-    width: 200px;
-    height: auto;
+
+    transform: rotate(360deg);
+
   }
-}*/
+
+}

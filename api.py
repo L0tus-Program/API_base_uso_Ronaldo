@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, abort, render_template
+from flask import Flask, request, jsonify, abort, render_template, send_from_directory
 from flask_cors import CORS
 import db
 import sqlite3
@@ -28,7 +28,7 @@ HOST = 'localhost'
 PORT = 5000
 
 # Criando aplicação
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', template_folder='templates')
 CORS(app)  # Quando subir pra VPS, configurar domínios que podem acessar
 
 # Autenticação
@@ -578,7 +578,7 @@ def update_token():
         return jsonify({'error': str(e)}), 400
 
 
-# Conferir API online
+"""# Conferir API online
 
 @app.route('/', methods=['GET'])
 def enviar_status():
@@ -599,7 +599,7 @@ def enviar_status():
 
     except Exception as e:
         return jsonify({"erro": "Erro ao acessar dados", "Error": str(e)}), 400
-
+"""
 # Rota para verificar as credenciais
 
 
@@ -619,10 +619,11 @@ def verificar_credenciais():
 
         # Execute uma consulta para verificar as credenciais (substitua com sua própria consulta)
         cursor.execute(
-            "SELECT * FROM users WHERE email = ? AND senha = ? ", (email, senha)
+            "SELECT * FROM users WHERE email = ? AND senha = ? ", (email,
+                                                                   senha)
         )
         usuario = cursor.fetchone()
-    
+
         # Feche a conexão com o banco de dados
         conn.close()
 
@@ -653,9 +654,23 @@ def verificar_credenciais():
         )
 
 
-@app.route("/template")
+@app.route('/')
 def index():
     return render_template('index.html')
+
+# Rota para servir os arquivos estáticos do React
+
+
+@app.route('/static/js/<path:filename>')
+def serve_static_js(filename):
+    return send_from_directory('static/js', filename)
+
+# Rota para servir os arquivos CSS
+
+
+@app.route('/static/css/<path:filename>')
+def serve_static_css(filename):
+    return send_from_directory('static/css', filename)
 
 
 if __name__ == '__main__':
