@@ -44,6 +44,74 @@ def authenticate():
         return True
 
 
+# Passar query
+ 
+@app.route('/query', methods=['POST'])
+def recebe_query():
+    if not authenticate():
+        log_request(request, jsonify(
+            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+        return abort(401)
+    try:
+        # Obtenha a consulta SQL do corpo da solicitação (POST)
+        query = request.get_data(as_text=True)
+       
+        print(f'Query = {query}')
+       
+        # Conecte-se ao banco de dados SQLite
+        conn = sqlite3.connect('openaai.db')
+        cursor = conn.cursor()
+       
+        # Execute a consulta SQL
+        cursor.execute(query)
+       
+        # Se a consulta for uma consulta SELECT, você pode buscar os resultados
+        if query.strip().lower().startswith("select"):
+            data = cursor.fetchall()
+            # Converta os resultados em uma lista de dicionários (caso necessário)
+            results = [dict(zip([column[0] for column in cursor.description], row)) for row in data]
+        else:
+            results = None
+       
+        conn.commit()
+        conn.close()
+ 
+        # Envie os dados como resposta em formato JSON
+        print(results)
+        return jsonify(results), 200
+ 
+    except Exception as e:
+        return jsonify({"erro": "Erro ao processar a consulta", "mensagem": str(e)}), 400
+ 
+ 
+# Função enviar todo o log
+@app.route('/all_log', methods=['GET'])
+def enviar_log():
+    if not authenticate():
+        log_request(request, jsonify(
+            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+        return abort(401)
+
+    try:
+
+         # Lê o conteúdo do arquivo log.txt
+        with open('log.txt', 'r') as arquivo_log:
+            conteudo_log = arquivo_log.read()
+        
+        payload = {
+            'log': conteudo_log,
+            # tempo de expiração do token
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
+        }
+        log_request(request, jsonify({'Payload': "LOG COMPLETO"}))
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        # return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
+
+        return jsonify({"mensagem": "Dados do banco de dados", "key": SECRET_KEY, "token": token}), 200
+
+    except Exception as e:
+        return jsonify({"erro": "Erro ao processar dados do banco de dados", "mensagem": str(e)}), 400
+ 
 # Função enviar todo o banco de dados
 @app.route('/all_db', methods=['GET'])
 def enviar_db():
@@ -246,6 +314,41 @@ def remove_registro():
         return jsonify({'error': str(e)}), 400
 
 
+
+# Remover pelo telefone
+@app.route('/remove_telefone', methods=['POST'])
+def remove_telefone():
+    if not authenticate():
+        log_request(request, jsonify(
+            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+        return abort(401)
+    try:
+        dados = request.get_data(as_text=True)
+       # print(f'Remover = {dados}\nTipo de dado = {type(dados)}')
+        conn = sqlite3.connect('openaai.db')
+        cursor = conn.cursor()
+        query = f"DELETE FROM clientes WHERE numero = {dados}"
+        # Execute a consulta SQL
+        cursor.execute(query)
+        conn.commit()
+        conn.close()
+        payload = {
+            'data': "Cliente removido com sucesso",
+            # tempo de expiração do token
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        # return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
+
+        log_request(request, jsonify({'Payload': payload}))
+        return jsonify({"key": SECRET_KEY, "token": token}), 200
+
+    except Exception as e:
+        # Em caso de erro, retorna uma resposta de erro
+        return jsonify({'error': str(e)}), 400
+
+
+
 # Update pelo ID
 @app.route('/update', methods=['POST'])
 def update_id():
@@ -367,7 +470,7 @@ def contar_clientes():
         log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 
-        return jsonify({"key": SECRET_KEY, "token": token}), 200
+        return jsonify(contador), 200
 
     except Exception as e:
         return jsonify({"erro": "Erro ao contar clientes", "mensagem": str(e)}), 400
@@ -578,7 +681,30 @@ def update_token():
         return jsonify({'error': str(e)}), 400
 
 
-"""# Conferir API online
+
+
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+# Rota para servir os arquivos estáticos do React
+
+
+@app.route('/static/js/<path:filename>')
+def serve_static_js(filename):
+    return send_from_directory('static/js', filename)
+
+# Rota para servir os arquivos CSS
+
+
+@app.route('/static/css/<path:filename>')
+def serve_static_css(filename):
+    return send_from_directory('static/css', filename)
+
+
+"""
+# Conferir API online
 
 @app.route('/', methods=['GET'])
 def enviar_status():
@@ -603,6 +729,54 @@ def enviar_status():
 # Rota para verificar as credenciais
 
 
+@app.route("/verificar_numero", methods=["POST"])
+def verificar_numero():
+    if not authenticate():
+        return abort(401)
+    try:
+        # Obter os dados JSON enviados na solicitação
+        data = request.get_json()
+        numero = data.get("numero")
+    
+
+        # Conecte-se ao banco de dados SQLite
+        conn = sqlite3.connect("openaai.db")
+        cursor = conn.cursor()
+
+        # Execute uma consulta para verificar as credenciais (substitua com sua própria consulta)
+        cursor.execute(
+            "SELECT * FROM clientes WHERE numero = ?", (numero)
+        )
+        usuario = cursor.fetchone()
+    
+        # Feche a conexão com o banco de dados
+        conn.close()
+
+        if usuario:
+            # Credenciais corretas, gera um token JWT
+            payload = {
+                # Assume que o primeiro campo é o ID do usuário
+                "usuario": usuario[0],
+                "numero": numero,
+                "token": usuario[4],
+                # tempo de expiração do token
+                "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1)
+            }
+
+            token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+            log_request(request, jsonify({'Payload': payload}))
+
+            return jsonify(payload), 200
+        else:
+            log_request(request, jsonify({'Payload': payload}))
+            return jsonify(payload), 401
+
+    except Exception as e:
+        return (
+            jsonify(
+                {"erro": "Erro ao verificar as credenciais", "mensagem": str(e)}),
+            500,
+        )
 @app.route("/verificar_credenciais", methods=["POST"])
 def verificar_credenciais():
     if not authenticate():
@@ -619,11 +793,10 @@ def verificar_credenciais():
 
         # Execute uma consulta para verificar as credenciais (substitua com sua própria consulta)
         cursor.execute(
-            "SELECT * FROM users WHERE email = ? AND senha = ? ", (email,
-                                                                   senha)
+            "SELECT * FROM users WHERE email = ? AND senha = ? ", (email, senha)
         )
         usuario = cursor.fetchone()
-
+    
         # Feche a conexão com o banco de dados
         conn.close()
 
@@ -653,25 +826,10 @@ def verificar_credenciais():
             500,
         )
 
-
-@app.route('/')
+"""@app.route("/template")
 def index():
     return render_template('index.html')
 
-# Rota para servir os arquivos estáticos do React
-
-
-@app.route('/static/js/<path:filename>')
-def serve_static_js(filename):
-    return send_from_directory('static/js', filename)
-
-# Rota para servir os arquivos CSS
-
-
-@app.route('/static/css/<path:filename>')
-def serve_static_css(filename):
-    return send_from_directory('static/css', filename)
-
-
+"""
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True,host='0.0.0.0', port=5000)
