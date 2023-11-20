@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import logo from '../monkey.svg';
-import github from '../github.svg';
-import '../Login.css';
-import { BrowserRouter as Router, Route,Routes, Link } from 'react-router-dom';
-import { Navigate } from "react-router-dom";
-import ReactDOM from 'react-dom/client';
-import Dash from './Rotas';
-import { BrowserRouter } from 'react-router-dom';
+import logo from './monkey.svg';
+import github from './github.svg';
+import './style.css';
 
-function Login() {
+
+
+
+function Home() {
   
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
@@ -56,17 +54,12 @@ function Login() {
           }*/
           if (parsedPayload.email.toLowerCase() === email.toLowerCase()) {
             console.log("logou");
-            const root = ReactDOM.createRoot(document.getElementById('root'));
-            root.render(
-              <BrowserRouter>
-                
-                <Dash />
-                
-              </BrowserRouter>
-            )
+           
+            
             
             //alert("Logou");
              // Redirecionamento para a página desejada
+             //<Link to="/signin">Sign In</Link>
             
           }
 
@@ -108,4 +101,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Home;
