@@ -6,8 +6,10 @@ import json
 import datetime
 import secrets
 import jwt
+import sys
+import os
 from utils import log_request
-# import threading
+#from utils import teste
 
 # Abra o arquivo JSON
 with open('src.json', 'r') as file:
@@ -33,21 +35,58 @@ CORS(app)  # Quando subir pra VPS, configurar domínios que podem acessar
 
 # Autenticação
 
-
 def authenticate():
+    print("Mensagem de autenticacao", file=sys.stdout)
     api_key = request.headers.get('X-API-KEY')
     print(api_key)
     if api_key != API_KEY:
+
         return abort(401)
     else:
-        print("Autenticado")
+        
         return True
+        
+
+
+
+# Registrar códigos return
+def log_responses(response):
+    status_code = response.status_code
+    conn = sqlite3.connect('openaai.db')
+    cursor = conn.cursor()
+    cursor.execute('UPDATE codigos_return SET x_vezes = x_vezes + 1 WHERE codigo = ?', (status_code,))
+    conn.commit()
+    conn.close()
+    return response
+
+
+@app.after_request
+def after_request(response):
+    return log_responses(response)
+
+
+
+# Rota para retornar a tabela codigos_return como JSON
+@app.route('/codigos_return', methods=['GET'])
+def get_codigos_return():
+    conn = sqlite3.connect('openaai.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM codigos_return')
+    rows = cursor.fetchall()
+    conn.close()
+
+    # Criar um dicionário com os resultados
+    data = [{'codigo': row[0], 'x_vezes': row[1]} for row in rows]
+    return jsonify(data)
+
 
 
 # Passar query
  
 @app.route('/query', methods=['POST'])
 def recebe_query():
+    print("Mensagem de debug", file=sys.stdout)
+    print("Mensagem de erro", file=sys.stderr)
     if not authenticate():
         log_request(request, jsonify(
             {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
@@ -56,11 +95,11 @@ def recebe_query():
         # Obtenha a consulta SQL do corpo da solicitação (POST)
         query = request.get_data(as_text=True)
        
-        print(f'Query = {query}')
-       
+        print(f'Query = {query}',file=sys.stderr)
+      
         # Conecte-se ao banco de dados SQLite
         conn = sqlite3.connect('openaai.db')
-        cursor = conn.cursor()
+        cursor = conn.cursor() 
        
         # Execute a consulta SQL
         cursor.execute(query)
@@ -78,6 +117,8 @@ def recebe_query():
  
         # Envie os dados como resposta em formato JSON
         print(results)
+        log_request(request, jsonify(
+            {'message': results}))
         return jsonify(results), 200
  
     except Exception as e:
@@ -93,7 +134,7 @@ def enviar_log():
         return abort(401)
 
     try:
-
+        print("Entrou all log")
          # Lê o conteúdo do arquivo log.txt
         with open('log.txt', 'r') as arquivo_log:
             conteudo_log = arquivo_log.read()
@@ -101,7 +142,7 @@ def enviar_log():
         payload = {
             'log': conteudo_log,
             # tempo de expiração do token
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
+            #'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
         }
         log_request(request, jsonify({'Payload': "LOG COMPLETO"}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
@@ -126,7 +167,7 @@ def enviar_db():
         cursor = conn.cursor()
 
         # Execute uma consulta para obter os dados do banco de dados (substitua com sua própria consulta)
-        cursor.execute("SELECT * FROM Clientes")
+        cursor.execute("SELECT * FROM clientes")
         data = cursor.fetchall()
 
         # Converta os dados em uma lista de dicionários
@@ -703,10 +744,10 @@ def serve_static_css(filename):
     return send_from_directory('static/css', filename)
 
 
-"""
+
 # Conferir API online
 
-@app.route('/', methods=['GET'])
+@app.route('/status', methods=['GET'])
 def enviar_status():
     if not authenticate():
         log_request(request, jsonify(
@@ -725,7 +766,7 @@ def enviar_status():
 
     except Exception as e:
         return jsonify({"erro": "Erro ao acessar dados", "Error": str(e)}), 400
-"""
+
 # Rota para verificar as credenciais
 
 
@@ -777,6 +818,10 @@ def verificar_numero():
                 {"erro": "Erro ao verificar as credenciais", "mensagem": str(e)}),
             500,
         )
+
+
+
+# Verificar credenciais de users para api whats
 @app.route("/verificar_credenciais", methods=["POST"])
 def verificar_credenciais():
     if not authenticate():
@@ -825,6 +870,61 @@ def verificar_credenciais():
                 {"erro": "Erro ao verificar as credenciais", "mensagem": str(e)}),
             500,
         )
+
+# Verificar credenciais dashboard API
+@app.route("/verificar_credenciais_dash", methods=["POST"])
+def verificar_credenciais_dash():
+    if not authenticate():
+        return abort(401)
+    try:
+        print("Entrou query")
+        # Obter os dados JSON enviados na solicitação
+        data = request.get_json()
+        email = data.get("email")
+        senha = data.get("senha")
+
+        # Conecte-se ao banco de dados SQLite
+        conn = sqlite3.connect("openaai.db")
+        cursor = conn.cursor()
+
+        # Execute uma consulta para verificar as credenciais (substitua com sua própria consulta)
+        cursor.execute(
+            "SELECT * FROM painel WHERE email = ? AND senha = ? ", (email, senha)
+        )
+        usuario = cursor.fetchone()
+        query = "INSERT INTO request_logs (request_number) VALUES (200);"
+        cursor.execute(query)
+    
+        # Feche a conexão com o banco de dados
+        conn.close()
+
+        if usuario:
+            # Credenciais corretas, gera um token JWT
+            payload = {
+                # Assume que o primeiro campo é o ID do usuário
+                "usuario": usuario[0],
+                "email": email,
+                "token": usuario[4],
+                # tempo de expiração do token
+                #"exp": datetime.datetime.utcnow() + datetime.timedelta(days=1)
+            }
+
+            token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+            log_request(request, jsonify({'Payload': payload}))
+
+            return jsonify({"key": SECRET_KEY, "mensagem": "Credenciais corretas", "token": token}), 200
+        else:
+            log_request(request, jsonify({'Payload': payload}))
+            return jsonify({"mensagem": "Credenciais incorretas"}), 401
+
+    except Exception as e:
+        return (
+            jsonify(
+                {"erro": "Erro ao verificar as credenciais", "mensagem": str(e)}),
+            500,
+        )
+
+
 
 """@app.route("/template")
 def index():
