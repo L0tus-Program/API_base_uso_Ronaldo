@@ -63,20 +63,26 @@ A API estará disponível em http://localhost:5000. OU outro ip/porta que você 
 
 # Endpoints
 
+- /codigos_return (GET): Retorna a tabela codigos_return como JSON.
+- /query (POST): Recebe e executa consultas SQL personalizadas.
+- /all_log (GET): Retorna todo o log armazenado no arquivo log.txt.
 - /all_db (GET): Retorna todos os dados do banco de dados.
-- /query (POST): Envie uma consulta SQL personalizada e receba os resultados.
-- /create_db (POST): Crie o banco de dados e tabelas.
-- /novo_contato (POST): Adicione um novo cliente ao banco de dados.
-- /remove_registro (POST): Remova um cliente pelo ID.
-- /update (POST): Atualize informações do cliente pelo ID.
-- /confirma_envio (POST): Atualize todos os registros com ConfirmaEnvio "sim" para "não".
-- /delete_clientes (POST): Exclua todos os registros de clientes.
+- /create_db (POST): Cria o banco de dados e tabelas.
+- /novo_contato (POST): Adiciona um novo cliente ao banco de dados.
+- /consultar_cliente/<cliente_id> (GET): Consulta um cliente pelo ID.
+- /remove_registro (POST): Remove um cliente pelo ID.
+- /remove_telefone (POST): Remove um cliente pelo telefone.
+- /update (POST): Atualiza informações do cliente pelo ID.
+- /update_password (POST): Atualiza a senha de um usuário pelo email.
+- /update_token (POST): Atualiza o token de um usuário pelo email.
+- /new_user (POST): Cria um novo usuário.
+- /delete_user (POST): Remove um usuário pelo email.
+- /confirma_envio (POST): Atualiza todos os registros com ConfirmaEnvio "sim" para "não".
+- /delete_clientes (POST): Exclui todos os registros de clientes.
 - /contar_clientes (GET): Contagem total de registros de clientes.
-- /confirmaEqualNao (GET): Retorne o primeiro cliente com ConfirmaEnvio "não".
-- /new_user (POST): Crie um novo usuário.
-- /delete_user (POST): Remova um usuário pelo email.
-- /update_password (POST): Atualize a senha de um usuário pelo email.
-- /update_token (POST): Atualize o token de um usuário pelo email.
+- /confirmaEqualNao (GET): Retorna o primeiro cliente com ConfirmaEnvio "não".
+- /enviar_false (GET): Retorna todos os clientes com enviar igual a 1.
+- /desabilita_cliente (POST): Altera o valor de enviar para 0 de um cliente.
   
 ## Contribuindo
 

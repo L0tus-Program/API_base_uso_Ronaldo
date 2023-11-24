@@ -304,3 +304,87 @@ Response Content:
 }
 
 
+24-11-2023 11:55:54 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente adicionado com sucesso",
+    "exp": "Sat, 25 Nov 2023 14:55:54 GMT"
+  }
+}
+
+
+24-11-2023 11:57:15 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "1", "numero": "1", "codClient": "1", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente adicionado com sucesso",
+    "exp": "Sat, 25 Nov 2023 14:57:15 GMT"
+  }
+}
+
+
+24-11-2023 12:06:04 - IP: 127.0.0.1
+Request Content:
+{"id": "1", "nome": "Allan", "numero": "5551997572169", "codClient": "123", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente adicionado com sucesso",
+    "exp": "Sat, 25 Nov 2023 15:06:04 GMT"
+  }
+}
+
+
+24-11-2023 13:23:35 - IP: 127.0.0.1
+Request Content:
+{"id": "32", "nome": "Felipe", "numero": "5551992090470", "codClient": "123", "ConfirmouWP": "123", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente adicionado com sucesso",
+    "exp": "Sat, 25 Nov 2023 16:23:35 GMT"
+  }
+}
+
+
+24-11-2023 13:46:51 - IP: 192.168.23.47
+Request Content:
+{"id": "1", "nome": "Felipe", "numero": "5551992090470", "codClient": "546", "ConfirmouWP": "545", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente adicionado com sucesso",
+    "exp": "Sat, 25 Nov 2023 16:46:51 GMT"
+  }
+}
+
+
+24-11-2023 13:49:22 - IP: 192.168.23.47
+Request Content:
+{"id": "5", "nome": "Allan", "numero": "5551997572169", "codClient": "123456", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente adicionado com sucesso",
+    "exp": "Sat, 25 Nov 2023 16:49:22 GMT"
+  }
+}
+
+
+24-11-2023 14:04:35 - IP: 192.168.23.47
+Request Content:
+{"id": "87", "nome": "Felipe", "numero": "5551992090470", "codClient": "123", "ConfirmouWP": "1", "ConfirmaEnvio": "1", "enviar": 1}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente adicionado com sucesso",
+    "exp": "Sat, 25 Nov 2023 17:04:35 GMT"
+  }
+}
+
+

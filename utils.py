@@ -1,6 +1,42 @@
 import datetime
 import smtplib
 from email.mime.text import MIMEText
+import requests 
+import json
+
+
+
+def send_whats(nome,numero):
+
+        
+    url = "https://api.conexaoia.digital/message/sendText/ronaldo"
+    
+
+    message = f'Olá {nome}, eu sou Ronaldo'
+
+
+    payload = json.dumps({
+    "number": numero,
+    "options": {
+        "delay": 1200,
+        "presence": "composing",
+        "linkPreview": False
+    },
+    "textMessage": {
+        "text": message
+    }
+    })
+    headers = {
+    'Content-Type': 'application/json',
+    'apikey': 'B6D711FCDE4D4FD5936544120E713976'
+    }
+    
+    response = requests.request("POST", url, headers=headers, data=payload)
+    
+    print(response.text)
+
+
+
 
 
 # Função pra criação de log
