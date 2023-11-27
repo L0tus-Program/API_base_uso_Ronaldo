@@ -388,3 +388,51 @@ Response Content:
 }
 
 
+27-11-2023 11:50:12 - IP: 192.168.23.205
+Request Content:
+{"codClient":"1234567"}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente desabilitado com sucesso",
+    "exp": "Tue, 28 Nov 2023 14:50:12 GMT"
+  }
+}
+
+
+27-11-2023 11:50:58 - IP: 192.168.23.205
+Request Content:
+{"codClient":"1234567"}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente desabilitado com sucesso",
+    "exp": "Tue, 28 Nov 2023 14:50:58 GMT"
+  }
+}
+
+
+27-11-2023 13:16:55 - IP: 192.168.23.205
+Request Content:
+{"codClient":"1234567"}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente n\u00e3o encontrado",
+    "exp": "Tue, 28 Nov 2023 16:16:55 GMT"
+  }
+}
+
+
+27-11-2023 13:17:05 - IP: 192.168.23.205
+Request Content:
+{"codClient":"1234567"}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente nao encontrado",
+    "exp": "Tue, 28 Nov 2023 16:17:05 GMT"
+  }
+}
+
+

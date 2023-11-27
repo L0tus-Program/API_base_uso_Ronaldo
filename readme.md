@@ -95,4 +95,3 @@ Sinta-se à vontade para contribuir para este projeto. Você pode abrir problema
 - Flask-RESTful -> Para melhor organização das requisições -> https://flask-restful.readthedocs.io/en/latest/
 - Implementar função de backup do banco de dados por e-mail
 - Criar tabela de dados para chave da API
-- Criar tabela de dados para usuarios do painel da API

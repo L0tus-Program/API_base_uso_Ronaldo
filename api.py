@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, abort, render_template, send_from_directory
+from flask import Flask, request, jsonify, abort, render_template, send_from_directory, send_file,after_this_request
 from flask_cors import CORS
 import db
 import sqlite3
@@ -8,8 +8,11 @@ import secrets
 import jwt
 import sys
 import os
-from utils import log_request,send_whats
+from utils import log_request,send_whats,last_client
+import threading
 #from utils import teste
+
+
 
 # Abra o arquivo JSON
 with open('src.json', 'r') as file:
@@ -47,6 +50,26 @@ def authenticate():
         return True
         
 
+def validar_cliente(codClient):
+    try:
+        print("Entrou validar cliente")
+        print("Entrou validar cliente", file=sys.stderr)
+        # Conecta-se ao banco de dados
+        conn = sqlite3.connect('openaai.db')
+        cursor = conn.cursor()
+
+        # Executa a consulta para verificar se o cliente existe
+        cursor.execute("SELECT EXISTS(SELECT 1 FROM clientes WHERE codClient = ?)", (codClient,))
+        exists = cursor.fetchone()[0]
+
+        # Fecha a conexão com o banco de dados
+        conn.close()
+
+        return True if exists == 1 else False
+    except Exception as e:
+        print(f"Erro ao verificar cliente: {str(e)}")
+        return False
+
 
 
 # Registrar códigos return
@@ -60,11 +83,24 @@ def log_responses(response):
     return response
 
 
+@app.before_request
+def before():
+    print("teste before")
+
+
 @app.after_request
 def after_request(response):
+    if request.path == '/novo_contato':
+        last = last_client()
+        if last:
+            nome, numero = last
+            # Iniciar a função em uma thread
+            t = threading.Thread(target=send_whats(nome,numero))
+            t.start()
+          
+            # Ações específicas para a rota '/novo_contato' aqui
+            
     return log_responses(response)
-
-
 
 # Rota para retornar a tabela codigos_return como JSON
 @app.route('/codigos_return', methods=['GET'])
@@ -128,31 +164,37 @@ def recebe_query():
 # Função enviar todo o log
 @app.route('/all_log', methods=['GET'])
 def enviar_log():
-    if not authenticate():
-        log_request(request, jsonify(
-            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-        return abort(401)
-
     try:
-        print("Entrou all log")
-         # Lê o conteúdo do arquivo log.txt
-        with open('log.txt', 'r') as arquivo_log:
-            conteudo_log = arquivo_log.read()
-        
-        payload = {
-            'log': conteudo_log,
-            # tempo de expiração do token
-            #'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
-        }
-        log_request(request, jsonify({'Payload': "LOG COMPLETO"}))
-        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        # return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
+        if not authenticate():
+            log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+            return abort(401)
 
-        return jsonify({"mensagem": "Dados do banco de dados", "key": SECRET_KEY, "token": token}), 200
+        # Envia o arquivo log.txt para download
+        return send_file('log.txt', as_attachment=True)
+
+    except Exception as e:
+        return jsonify({"erro": "Erro ao processar dados do log", "mensagem": str(e)}), 400
+
+
+
+
+# Função enviar todo o banco de dados
+@app.route('/backup', methods=['GET'])
+def backup():
+    try:
+        if not authenticate():
+            log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+            return abort(401)
+
+        # Envia o arquivo log.txt para download
+        return send_file('openaai.db', as_attachment=True)
 
     except Exception as e:
         return jsonify({"erro": "Erro ao processar dados do banco de dados", "mensagem": str(e)}), 400
- 
+
+
+
+
 # Função enviar todo o banco de dados
 @app.route('/all_db', methods=['GET'])
 def enviar_db():
@@ -219,7 +261,7 @@ def criar_db():
             'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        # return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
+        
 
         log_request(request, jsonify({'Payload': payload}))
         return jsonify({"key": SECRET_KEY, "token": token}), 200
@@ -237,10 +279,7 @@ def novo_contato():
             {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
         return abort(401)
     try:
-        # t = threading.Thread(target=lambda: mail())
-        # t.mail()
-
-        # mail()
+        
         # Recebe os dados JSON da solicitação POST
         dados = request.get_json()
         print(f"Dados = {dados}")
@@ -274,7 +313,8 @@ def novo_contato():
         log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         # return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
-        send_whats(nome,numero)
+        
+       
         return jsonify({"key": SECRET_KEY, "token": token}), 200
 
     except Exception as e:
@@ -577,6 +617,53 @@ def enviar_false():
 
         # Execute uma consulta para obter os dados do banco de dados (substitua com sua própria consulta)
         cursor.execute(
+            "SELECT * FROM clientes WHERE enviar = 0")
+        # Recupere o valor do contador
+        registro = cursor.fetchone()
+
+        # Feche a conexão com o banco de dados
+        conn.close()
+
+        # Envie os dados como resposta em formato JSON
+        if registro is None:
+            payload = {
+                'data': "Nenhum cliente encontrado",
+                # tempo de expiração do token
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
+            }
+            token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+            log_request(request, jsonify({'Payload': payload}))
+
+            return jsonify({"key": SECRET_KEY, "token": token}), 200
+
+        payload = {
+            'data': registro,
+            # tempo de expiração do token
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
+        }
+        log_request(request, jsonify({'Payload': payload}))
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+
+        return jsonify({"key": SECRET_KEY, "token": token}), 200
+
+    except Exception as e:
+        return jsonify({"erro": "Erro", "mensagem": str(e)}), 400
+
+
+# Retronar todos os clientes com ENVIAR igual a 1
+@app.route('/enviar_true', methods=['GET'])
+def enviar_true():
+    if not authenticate():
+        log_request(request, jsonify(
+            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+        return abort(401)
+    try:
+        # Conecte-se ao banco de dados SQLite
+        conn = sqlite3.connect('openaai.db')
+        cursor = conn.cursor()
+
+        # Execute uma consulta para obter os dados do banco de dados (substitua com sua própria consulta)
+        cursor.execute(
             "SELECT * FROM clientes WHERE enviar = 1")
         # Recupere o valor do contador
         registro = cursor.fetchone()
@@ -730,8 +817,8 @@ def update_password():
 
 
 
-# Alterar enviar = 0 
-@app.route('/desabilita_cliente',method = ['POST'])
+# Alterar enviar para 0 
+@app.route('/desabilita_cliente',methods = ['POST'])
 def desabilita():
     if not authenticate():
         log_request(request, jsonify(
@@ -741,16 +828,28 @@ def desabilita():
         # Recebe o email e a nova senha do usuário a ser atualizada no corpo da solicitação POST
         data = request.get_json()
         codClient = data['codClient']
-        
+        # Verifique se o cliente existe
+        if not validar_cliente(codClient):
+            payload = {
+            'data': "Cliente nao encontrado",
+            # tempo de expiração do token
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
+             }
+            log_request(request, jsonify({'Payload': payload}))
+            token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+
+            return jsonify({"key": SECRET_KEY, "token": token,}), 200
+           
 
         # Conecta-se ao banco de dados
         conn = sqlite3.connect('openaai.db')
         cursor = conn.cursor()
 
-        # Executa a query SQL para atualizar a senha do usuário com base no email
-        query = "UPDATE users SET enviar = 0 WHERE codClient = ?"
-        cursor.execute(query, (codClient))
-
+        # Executa a query SQL 
+        query = f'UPDATE clientes SET enviar = 0 WHERE codClient = {codClient}'
+        #cursor.execute(query, (codClient))
+        cursor.execute(query)
+        print(f'Executando query = {query}' )
         # Comita a transação e fecha a conexão com o banco de dados
         conn.commit()
         conn.close()
@@ -762,11 +861,12 @@ def desabilita():
         log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 
-        return jsonify({"key": SECRET_KEY, "token": token}), 200
+        return jsonify({"key": SECRET_KEY, "token": token,}), 200
 
     except Exception as e:
         # Em caso de erro, retorna uma resposta de erro
         return jsonify({'error': str(e)}), 400
+
 
 
 # Alterar token do usuário
@@ -872,9 +972,9 @@ def verificar_numero():
 
         # Execute uma consulta para verificar as credenciais (substitua com sua própria consulta)
         cursor.execute(
-            "SELECT * FROM clientes WHERE numero = ?", (numero)
+            f'SELECT * FROM clientes WHERE numero = {numero}'
         )
-        usuario = cursor.fetchone()
+        usuario = cursor.fetchone()   
     
         # Feche a conexão com o banco de dados
         conn.close()
@@ -995,8 +1095,9 @@ def verificar_credenciais_dash():
             }
 
             token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+            
             log_request(request, jsonify({'Payload': payload}))
-
+            
             return jsonify({"key": SECRET_KEY, "mensagem": "Credenciais corretas", "token": token}), 200
         else:
             log_request(request, jsonify({'Payload': payload}))
@@ -1009,12 +1110,5 @@ def verificar_credenciais_dash():
             500,
         )
 
-
-
-"""@app.route("/template")
-def index():
-    return render_template('index.html')
-
-"""
 if __name__ == '__main__':
     app.run(debug=True,host='0.0.0.0', port=5000)

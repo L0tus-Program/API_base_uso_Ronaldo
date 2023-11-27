@@ -3,38 +3,41 @@ import smtplib
 from email.mime.text import MIMEText
 import requests 
 import json
-
+import time
+import sqlite3
 
 
 def send_whats(nome,numero):
+    time.sleep(15)
+    try:
 
+        url = "https://api.conexaoia.digital/message/sendText/ronaldo"
         
-    url = "https://api.conexaoia.digital/message/sendText/ronaldo"
-    
-
-    message = f'Olá {nome}, eu sou Ronaldo'
+        message = f'Olá {nome}, eu sou Ronaldo'
 
 
-    payload = json.dumps({
-    "number": numero,
-    "options": {
-        "delay": 1200,
-        "presence": "composing",
-        "linkPreview": False
-    },
-    "textMessage": {
-        "text": message
-    }
-    })
-    headers = {
-    'Content-Type': 'application/json',
-    'apikey': 'B6D711FCDE4D4FD5936544120E713976'
-    }
-    
-    response = requests.request("POST", url, headers=headers, data=payload)
-    
-    print(response.text)
-
+        payload = json.dumps({
+        "number": numero,
+        "options": {
+            "delay": 1200,
+            "presence": "composing",
+            "linkPreview": False
+        },
+        "textMessage": {
+            "text": message
+        }
+        })
+        headers = {
+        'Content-Type': 'application/json',
+        'apikey': 'B6D711FCDE4D4FD5936544120E713976'
+        }
+        
+        response = requests.request("POST", url, headers=headers, data=payload)
+        
+        print(response.text)
+    except Exception as e:
+        pass 
+    # Como contornar o problema caso a evolution cair ?
 
 
 
@@ -57,9 +60,9 @@ def log_request(request, response):
 def mail():
     print("Entrando na função mail")
         # Dados de autenticação
-    username = "seu-email"
-    password = "sua-senha"
-    emailDestino = "destino"
+    username = "openaai@conexaoia.digital"
+    password = "Messem@2023"
+    emailDestino = "felipe.gomes@messeminvestimentos.com.br"
     conteudo = "Erro com a APi"
     # Criação do objeto MIMEText
     msg = MIMEText(conteudo, 'plain', 'utf-8') # é necessário codificar o objeto para utf-8 para poder enviar acentos
@@ -77,3 +80,17 @@ def mail():
         server.sendmail(username, emailDestino, msg.as_string())
 
     print("E-mail enviado com sucesso!")
+
+
+
+# Retorna o ultimo cliente cadastrado
+def last_client():
+    conn = sqlite3.connect('openaai.db')
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT nome, numero FROM clientes ORDER BY id DESC LIMIT 1")
+    last_client = cursor.fetchone()
+
+    conn.close()
+
+    return last_client if last_client else None
