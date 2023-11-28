@@ -4,7 +4,7 @@ const contentType = 'application/json'; // Tipo de conteúdo apropriado para a s
 
 // Corpo da solicitação com os valores coletados, incluindo a senha da API
 const data = {
-  codClient: "89994"
+  codClient: "010101"
 };
 
 // Configuração da solicitação com a senha da API no cabeçalho

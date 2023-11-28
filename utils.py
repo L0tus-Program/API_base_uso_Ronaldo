@@ -8,12 +8,12 @@ import sqlite3
 
 
 def send_whats(nome,numero):
-    time.sleep(15)
+    #time.sleep(15)
     try:
 
         url = "https://api.conexaoia.digital/message/sendText/ronaldo"
         
-        message = f'Olá {nome}, eu sou Ronaldo'
+        message = f'Olá {nome}. Sou o Ronaldo e trabalho como especialista em renda variável. Estou aqui para oferecer sugestões e orientações sobre investimentos nessa área.'
 
 
         payload = json.dumps({

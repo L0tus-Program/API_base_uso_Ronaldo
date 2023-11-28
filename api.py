@@ -312,7 +312,6 @@ def novo_contato():
         }
         log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        # return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
         
        
         return jsonify({"key": SECRET_KEY, "token": token}), 200
@@ -619,7 +618,7 @@ def enviar_false():
         cursor.execute(
             "SELECT * FROM clientes WHERE enviar = 0")
         # Recupere o valor do contador
-        registro = cursor.fetchone()
+        registro = cursor.fetchall()
 
         # Feche a conexão com o banco de dados
         conn.close()
@@ -662,11 +661,11 @@ def enviar_true():
         conn = sqlite3.connect('openaai.db')
         cursor = conn.cursor()
 
-        # Execute uma consulta para obter os dados do banco de dados (substitua com sua própria consulta)
+        # Execute uma consulta para obter os dados do banco de dados 
         cursor.execute(
-            "SELECT * FROM clientes WHERE enviar = 1")
+            "SELECT * FROM clientes WHERE enviar = '1'")
         # Recupere o valor do contador
-        registro = cursor.fetchone()
+        registro = cursor.fetchall()
 
         # Feche a conexão com o banco de dados
         conn.close()
@@ -846,7 +845,8 @@ def desabilita():
         cursor = conn.cursor()
 
         # Executa a query SQL 
-        query = f'UPDATE clientes SET enviar = 0 WHERE codClient = {codClient}'
+        query = f"UPDATE clientes SET enviar = 0 WHERE codClient = '{codClient}'"
+
         #cursor.execute(query, (codClient))
         cursor.execute(query)
         print(f'Executando query = {query}' )
@@ -866,6 +866,59 @@ def desabilita():
     except Exception as e:
         # Em caso de erro, retorna uma resposta de erro
         return jsonify({'error': str(e)}), 400
+
+
+# Alterar enviar para 1
+@app.route('/habilita_cliente',methods = ['POST'])
+def habilita():
+    if not authenticate():
+        log_request(request, jsonify(
+            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+        return abort(401)
+    try:
+        # Recebe o email e a nova senha do usuário a ser atualizada no corpo da solicitação POST
+        data = request.get_json()
+        codClient = data['codClient']
+        # Verifique se o cliente existe
+        if not validar_cliente(codClient):
+            payload = {
+            'data': "Cliente nao encontrado",
+            # tempo de expiração do token
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
+             }
+            log_request(request, jsonify({'Payload': payload}))
+            token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+
+            return jsonify({"key": SECRET_KEY, "token": token,}), 200
+           
+
+        # Conecta-se ao banco de dados
+        conn = sqlite3.connect('openaai.db')
+        cursor = conn.cursor()
+
+        # Executa a query SQL 
+        query = f"UPDATE clientes SET enviar = 1 WHERE codClient = '{codClient}'"
+
+        #cursor.execute(query, (codClient))
+        cursor.execute(query)
+        print(f'Executando query = {query}' )
+        # Comita a transação e fecha a conexão com o banco de dados
+        conn.commit()
+        conn.close()
+        payload = {
+            'data': "Cliente habilitado com sucesso",
+            # tempo de expiração do token
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
+        }
+        log_request(request, jsonify({'Payload': payload}))
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+
+        return jsonify({"key": SECRET_KEY, "token": token,}), 200
+
+    except Exception as e:
+        # Em caso de erro, retorna uma resposta de erro
+        return jsonify({'error': str(e)}), 400
+
 
 
 

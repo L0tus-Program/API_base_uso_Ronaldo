@@ -63,30 +63,35 @@ A API estará disponível em http://localhost:5000. OU outro ip/porta que você 
 
 # Endpoints
 
-- /codigos_return (GET): Retorna a tabela codigos_return como JSON.
-- /query (POST): Recebe e executa consultas SQL personalizadas.
-- /all_log (GET): Retorna todo o log armazenado no arquivo log.txt.
-- /all_db (GET): Retorna todos os dados do banco de dados.
-- /create_db (POST): Cria o banco de dados e tabelas.
+/codigos_return (GET): Retorna a tabela codigos_return como JSON, possivelmente para análise de status de respostas.
+
+- /query (POST): Recebe e executa uma consulta SQL personalizada.
+- /all_log (GET): Envia todo o log registrado, provavelmente como um arquivo para download.
+- /backup (GET): Envia um backup do banco de dados, presumivelmente para fins de recuperação ou análise.
+- /all_db (GET): Retorna todos os dados do banco de dados, semelhante ao endpoint anterior.
+- /create_db (POST): Cria o banco de dados e suas tabelas.
 - /novo_contato (POST): Adiciona um novo cliente ao banco de dados.
-- /consultar_cliente/<cliente_id> (GET): Consulta um cliente pelo ID.
-- /remove_registro (POST): Remove um cliente pelo ID.
-- /remove_telefone (POST): Remove um cliente pelo telefone.
+- /consultar_cliente/int:cliente_id (GET): Consulta informações de um cliente pelo seu ID.
+- /remove_registro (POST): Remove um registro de cliente pelo ID.
+- /remove_telefone (POST): Remove um registro de cliente pelo número de telefone.
 - /update (POST): Atualiza informações do cliente pelo ID.
-- /update_password (POST): Atualiza a senha de um usuário pelo email.
-- /update_token (POST): Atualiza o token de um usuário pelo email.
+- /confirma_envio (POST): Atualiza registros de clientes para indicar a confirmação de envio.
+- /delete_clientes (POST): Deleta todos os registros de clientes.
+- /contar_clientes (GET): Retorna a contagem total de clientes.
+- /confirmaEqualNao (GET): Retorna o primeiro cliente com ConfirmaEnvio igual a "não".
+- /enviar_false (GET) e /enviar_true (GET): Retornam clientes com o campo enviar configurado como 0 ou 1, respectivamente.
 - /new_user (POST): Cria um novo usuário.
 - /delete_user (POST): Remove um usuário pelo email.
-- /confirma_envio (POST): Atualiza todos os registros com ConfirmaEnvio "sim" para "não".
-- /delete_clientes (POST): Exclui todos os registros de clientes.
-- /contar_clientes (GET): Contagem total de registros de clientes.
-- /confirmaEqualNao (GET): Retorna o primeiro cliente com ConfirmaEnvio "não".
-- /enviar_false (GET): Retorna todos os clientes com enviar igual a 1.
-- /desabilita_cliente (POST): Altera o valor de enviar para 0 de um cliente.
+- /update_password (POST): Atualiza a senha de um usuário pelo email.
+- /update_token (POST): Atualiza o token de um usuário pelo email.
+- /desabilita_cliente (POST) e /habilita_cliente (POST): Alteram o status de envio de um cliente para 0 ou 1.
+- /status (GET): Verifica o status da API, indicando se está online.
+- /verificar_numero (POST), /verificar_credenciais (POST), /verificar_credenciais_dash (POST): Validam as credenciais de clientes ou usuários, cada um para um propósito específico (número de telefone, usuários da API do WhatsApp, e painel de controle, respectivamente).
   
 ## Contribuindo
 
 Sinta-se à vontade para contribuir para este projeto. Você pode abrir problemas, enviar solicitações de pull e melhorar a documentação.
+
 
 
 ## Possíveis implementações
@@ -95,3 +100,5 @@ Sinta-se à vontade para contribuir para este projeto. Você pode abrir problema
 - Flask-RESTful -> Para melhor organização das requisições -> https://flask-restful.readthedocs.io/en/latest/
 - Implementar função de backup do banco de dados por e-mail
 - Criar tabela de dados para chave da API
+- Configurar IP permitido para acessar a rota de log e backup
+- Melhor utilização de before e after request
