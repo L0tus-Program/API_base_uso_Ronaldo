@@ -123,6 +123,35 @@ def popular_dash():
     conn.commit()
     conn.close()
 
+
+
+def lista_espera():
+    print("Criando tabela de espera")
+    # Conectar ao banco de dados SQLite (ou criar um novo se não existir)
+    conn = sqlite3.connect('openaai.db')
+
+    # Criar um cursor para executar comandos SQL
+    cursor = conn.cursor()
+    # Definir o comando SQL para criar a tabela
+    create_table_query = '''
+    CREATE TABLE IF NOT EXISTS lista_espera ( 
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT,
+            numero TEXT,
+            codClient TEXT
+        
+    )
+    ''' 
+    
+
+    # Executar o comando SQL para criar a tabela
+    cursor.execute(create_table_query)
+    conn.commit()
+    conn.close()
+
+
+
+
 criar_db_sqlite()
 
 criar_login()
@@ -135,3 +164,5 @@ dash()
 popular_dash()
 
 popular_codigos_return()
+
+lista_espera()

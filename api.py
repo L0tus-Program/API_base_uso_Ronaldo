@@ -8,7 +8,7 @@ import secrets
 import jwt
 import sys
 import os
-from utils import log_request,send_whats,last_client
+from utils import log_request,send_whats,last_client,export_to_csv
 import threading
 #from utils import teste
 
@@ -90,13 +90,13 @@ def before():
 
 @app.after_request
 def after_request(response):
-    if request.path == '/novo_contato':
+    """if request.path == '/novo_contato':
         last = last_client()
         if last:
             nome, numero = last
             # Iniciar a função em uma thread
             t = threading.Thread(target=send_whats(nome,numero))
-            t.start()
+            t.start()"""
           
             # Ações específicas para a rota '/novo_contato' aqui
             
@@ -161,6 +161,23 @@ def recebe_query():
         return jsonify({"erro": "Erro ao processar a consulta", "mensagem": str(e)}), 400
  
  
+# Download ativos
+@app.route('/download_ativos', methods=['GET'])
+def ativos():
+    try:
+        if not authenticate():
+            log_request(request, jsonify({'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+            return abort(401)
+
+        # Envia o arquivo log.txt para download
+       
+        return send_file('relatorio.csv', as_attachment=True)
+
+    except Exception as e:
+        return jsonify({"erro": "Erro ao processar dados", "mensagem": str(e)}), 400
+
+
+
 # Função enviar todo o log
 @app.route('/all_log', methods=['GET'])
 def enviar_log():
@@ -312,7 +329,11 @@ def novo_contato():
         }
         log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        
+        if send_whats(nome,numero) == "Erro":
+            payload = {
+                'data': "Evolution off"
+            }
+            return jsonify({"message":"Erro"}),204
        
         return jsonify({"key": SECRET_KEY, "token": token}), 200
 

@@ -52,8 +52,8 @@ def secret():
         print('Resposta da API:', response.text)
 
 
-secret_key = secret()
-print(secret_key)
+#secret_key = secret()
+#print(secret_key)
 
 def inserir_dados():   
     # Dados da solicitação POST
@@ -72,24 +72,20 @@ def inserir_dados():
     #data = sql_query
 
 
-    id = input("Insira o ID : ")
+    
     nome = input("Insira o nome : ")
     numero  = input("Insira o numero : ")
     codClient = input("Insira o codClient : ")
-    ConfirmouWP = input("Insira o ConfirmouWP : ")
-    ConfirmaEnvio = input("Insira o ConfirmaEnvio : ")
-    envia = input("0 - False 1 - True : ")
-
+  
+  
 
     # Corpo da solicitação
     data = {
-        "id": id,
+      
         "nome": nome,
         "numero": numero,
         "codClient": codClient,
-        "ConfirmouWP": ConfirmouWP,
-        "ConfirmaEnvio": ConfirmaEnvio,
-        "enviar" : int(envia)
+        
     }
  
 

@@ -102,3 +102,12 @@ Sinta-se à vontade para contribuir para este projeto. Você pode abrir problema
 - Criar tabela de dados para chave da API
 - Configurar IP permitido para acessar a rota de log e backup
 - Melhor utilização de before e after request
+
+
+
+# A fazer
+
+- Terminar de criar a tabela de lista de espera
+- Try exception na evolution verificando sua disponibilidade
+  - Em caso de erro, ficar verificando. Quando a API voltar enviar a mensagem de boas vindas para os clientes que estão em lista de espera
+  - Após cada envio, remover o cliente da tabela

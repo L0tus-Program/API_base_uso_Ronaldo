@@ -5,7 +5,7 @@ import requests
 import json
 import time
 import sqlite3
-
+import csv
 
 def send_whats(nome,numero):
     #time.sleep(15)
@@ -35,6 +35,8 @@ def send_whats(nome,numero):
         response = requests.request("POST", url, headers=headers, data=payload)
         
         print(response.text)
+        if response.text != 201:
+            return 'Erro'
     except Exception as e:
         pass 
     # Como contornar o problema caso a evolution cair ?
@@ -94,3 +96,32 @@ def last_client():
     conn.close()
 
     return last_client if last_client else None
+
+
+def export_to_csv():
+    try:
+        conn = sqlite3.connect('openaai.db')
+        cursor = conn.cursor()
+
+        # Sua consulta SQL
+        query =  "SELECT * FROM clientes WHERE enviar = '1'"
+
+        cursor.execute(query)
+        rows = cursor.fetchall()
+
+        # Nome do arquivo CSV de saída
+        csv_file = 'relatorio.csv'
+
+        with open(csv_file, 'w', newline='', encoding='utf-8') as file:
+            csv_writer = csv.writer(file)
+            csv_writer.writerow([i[0] for i in cursor.description])  # Escreve os cabeçalhos das colunas
+            csv_writer.writerows(rows)  # Escreve os dados das linhas
+
+        print(f"Os dados foram exportados para {csv_file} com sucesso.")
+
+    except sqlite3.Error as e:
+        print(f"Erro ao exportar para CSV: {e}")
+
+    finally:
+        if conn:
+            conn.close()
