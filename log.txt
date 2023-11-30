@@ -436,3 +436,51 @@ Response Content:
 }
 
 
+30-11-2023 14:53:07 - IP: 192.168.0.249
+Request Content:
+{"nome": "Felipe", "numero": "777777777777777", "codClient": "teste1"}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente adicionado com sucesso",
+    "exp": "Fri, 01 Dec 2023 17:53:07 GMT"
+  }
+}
+
+
+30-11-2023 14:55:08 - IP: 192.168.0.249
+Request Content:
+{"nome": "Felipe", "numero": "555555", "codClient": "teste2"}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente adicionado com sucesso",
+    "exp": "Fri, 01 Dec 2023 17:55:08 GMT"
+  }
+}
+
+
+30-11-2023 14:56:06 - IP: 192.168.0.249
+Request Content:
+{"nome": "Felipe", "numero": "44444", "codClient": "teste3"}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente adicionado com sucesso",
+    "exp": "Fri, 01 Dec 2023 17:56:06 GMT"
+  }
+}
+
+
+30-11-2023 15:09:54 - IP: 192.168.0.249
+Request Content:
+{"nome": "Felipe errado", "numero": "55555555555", "codClient": "Errado aaa"}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente adicionado com sucesso",
+    "exp": "Fri, 01 Dec 2023 18:09:54 GMT"
+  }
+}
+
+

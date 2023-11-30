@@ -111,3 +111,7 @@ Sinta-se à vontade para contribuir para este projeto. Você pode abrir problema
 - Try exception na evolution verificando sua disponibilidade
   - Em caso de erro, ficar verificando. Quando a API voltar enviar a mensagem de boas vindas para os clientes que estão em lista de espera
   - Após cada envio, remover o cliente da tabela
+
+
+
+- Endpoint verificar_numero esta sem JWT

@@ -1,46 +1,97 @@
 import datetime
 import smtplib
 from email.mime.text import MIMEText
-import requests 
+import requests
 import json
-import time
+# import time
 import sqlite3
 import csv
+import threading
 
-def send_whats(nome,numero):
-    #time.sleep(15)
+
+def send_whats(nome, numero, codClient):
+    # time.sleep(15)
     try:
 
         url = "https://api.conexaoia.digital/message/sendText/ronaldo"
-        
+
         message = f'Olá {nome}. Sou o Ronaldo e trabalho como especialista em renda variável. Estou aqui para oferecer sugestões e orientações sobre investimentos nessa área.'
 
-
         payload = json.dumps({
-        "number": numero,
-        "options": {
-            "delay": 1200,
-            "presence": "composing",
-            "linkPreview": False
-        },
-        "textMessage": {
-            "text": message
-        }
+            "number": numero,
+            "options": {
+                "delay": 1200,
+                "presence": "composing",
+                "linkPreview": False
+            },
+            "textMessage": {
+                "text": message
+            }
         })
         headers = {
-        'Content-Type': 'application/json',
-        'apikey': 'B6D711FCDE4D4FD5936544120E713976'
+            'Content-Type': 'application/json',
+            'apikey': 'B6D711FCDE4D4FD5936544120E713976'
         }
-        
+
         response = requests.request("POST", url, headers=headers, data=payload)
-        
+
         print(response.text)
-        if response.text != 201:
-            return 'Erro'
+        print(response.status_code)
+        if response.status_code != 201:
+            try:
+                conn = sqlite3.connect('openaai.db')
+                cursor = conn.cursor()
+                # Executa a query SQL para inserir um novo cliente na tabela
+                query = "INSERT INTO lista_espera ( nome, numero, codClient) VALUES ( ?, ?, ?)"
+                cursor.execute(query, (nome, numero, codClient,
+                                    ))
+
+                # Comita a transação e fecha a conexão com o banco de dados
+                conn.commit()
+                conn.close()
+
+                return 'Erro'
+            except Exception as e:
+                pass
+            finally:
+
+            
+        
+        # Após o envio bem-sucedido, exclua o cliente da tabela
+        conn = sqlite3.connect('openaai.db')
+        cursor = conn.cursor()
+
+        # Comando para excluir o cliente da tabela lista_espera
+        query_delete = "DELETE FROM lista_espera WHERE codClient = ?"
+        cursor.execute(query_delete, (codClient,))
+        conn.commit()
+        conn.close()
     except Exception as e:
-        pass 
+        pass
     # Como contornar o problema caso a evolution cair ?
 
+
+def invoca_lista():
+    try:
+        # Dados da solicitação POST
+        api_url = 'http://192.168.0.249:5000/lista_espera'  # Substitua pela URL da sua API
+        content_type = 'application/json'  # Tipo de conteúdo apropriado para a sua API
+        # sql_query = 'SELECT * FROM Clientes'  # Sua consulta SQL
+        api_key = "F14C7D7625414A3E5DA1811349667"
+
+        # Cabeçalho da solicitação
+        headers = {
+            'Content-Type': content_type,
+            'X-API-KEY': str(api_key)
+        }
+
+       
+        # Enviando a solicitação POST
+        response = requests.post(api_url, headers=headers)
+        print(response)
+    except Exception as e:
+        pass
+        
 
 
 
@@ -61,13 +112,14 @@ def log_request(request, response):
 
 def mail():
     print("Entrando na função mail")
-        # Dados de autenticação
+    # Dados de autenticação
     username = "openaai@conexaoia.digital"
     password = "Messem@2023"
     emailDestino = "felipe.gomes@messeminvestimentos.com.br"
     conteudo = "Erro com a APi"
     # Criação do objeto MIMEText
-    msg = MIMEText(conteudo, 'plain', 'utf-8') # é necessário codificar o objeto para utf-8 para poder enviar acentos
+    # é necessário codificar o objeto para utf-8 para poder enviar acentos
+    msg = MIMEText(conteudo, 'plain', 'utf-8')
     msg['To'] = emailDestino
     msg['From'] = username
     msg['Subject'] = "Erro com a API"
@@ -84,13 +136,13 @@ def mail():
     print("E-mail enviado com sucesso!")
 
 
-
-# Retorna o ultimo cliente cadastrado
+# Retorna o ultimo cliente cadastrado -> Deixou de ser usada, pode ser removida pro deploy final
 def last_client():
     conn = sqlite3.connect('openaai.db')
     cursor = conn.cursor()
 
-    cursor.execute("SELECT nome, numero FROM clientes ORDER BY id DESC LIMIT 1")
+    cursor.execute(
+        "SELECT nome, numero FROM clientes ORDER BY id DESC LIMIT 1")
     last_client = cursor.fetchone()
 
     conn.close()
@@ -104,7 +156,7 @@ def export_to_csv():
         cursor = conn.cursor()
 
         # Sua consulta SQL
-        query =  "SELECT * FROM clientes WHERE enviar = '1'"
+        query = "SELECT * FROM clientes WHERE enviar = '1'"
 
         cursor.execute(query)
         rows = cursor.fetchall()
@@ -114,7 +166,8 @@ def export_to_csv():
 
         with open(csv_file, 'w', newline='', encoding='utf-8') as file:
             csv_writer = csv.writer(file)
-            csv_writer.writerow([i[0] for i in cursor.description])  # Escreve os cabeçalhos das colunas
+            # Escreve os cabeçalhos das colunas
+            csv_writer.writerow([i[0] for i in cursor.description])
             csv_writer.writerows(rows)  # Escreve os dados das linhas
 
         print(f"Os dados foram exportados para {csv_file} com sucesso.")
