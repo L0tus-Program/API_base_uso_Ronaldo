@@ -107,11 +107,14 @@ Sinta-se à vontade para contribuir para este projeto. Você pode abrir problema
 
 # A fazer
 
-- Terminar de criar a tabela de lista de espera
-- Try exception na evolution verificando sua disponibilidade
-  - Em caso de erro, ficar verificando. Quando a API voltar enviar a mensagem de boas vindas para os clientes que estão em lista de espera
-  - Após cada envio, remover o cliente da tabela
+
 
 
 
 - Endpoint verificar_numero esta sem JWT
+
+
+# Alteração a alinhar
+
+- Adicionei ao endpoint /verificar_credenciais o registro de token aleatório na tabela users, ele já era retornado no payload
+- O token aleatório só é registrado no /verificar_credenciais. O endpoint /consulta_user retorna todos os dados através do e-mail

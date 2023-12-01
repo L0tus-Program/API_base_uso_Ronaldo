@@ -59,7 +59,7 @@ def secret():
 def inserir_dados():
     try:
         # Dados da solicitação POST
-        api_url = 'http://192.168.0.249:5000/novo_contato'  # Substitua pela URL da sua API
+        api_url = 'http://192.168.23.205:5000/novo_contato'  # Substitua pela URL da sua API
         content_type = 'application/json'  # Tipo de conteúdo apropriado para a sua API
         # sql_query = 'SELECT * FROM Clientes'  # Sua consulta SQL
         api_key = "F14C7D7625414A3E5DA1811349667"

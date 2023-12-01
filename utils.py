@@ -6,7 +6,8 @@ import json
 # import time
 import sqlite3
 import csv
-import threading
+import threading #Devo fazer a nova tentativa da evolution em outra thread ?
+import jwt
 
 
 def send_whats(nome, numero, codClient):
@@ -54,6 +55,51 @@ def send_whats(nome, numero, codClient):
             except Exception as e:
                 pass
             finally:
+                try:
+                    # Dados da solicitação POST
+                    api_url = 'http://192.168.0.249:5000/novo_contato'  # Substitua pela URL da sua API
+                    content_type = 'application/json'  # Tipo de conteúdo apropriado para a sua API
+                    # sql_query = 'SELECT * FROM Clientes'  # Sua consulta SQL
+                    api_key = "F14C7D7625414A3E5DA1811349667"
+
+                    # Cabeçalho da solicitação
+                    headers = {
+                        'Content-Type': content_type,
+                        'X-API-KEY': str(api_key)
+                    }
+
+                   
+
+
+                    # Enviando a solicitação POST
+                    response = requests.post(api_url, headers=headers)
+                    print("Response")
+                    print(response)
+                    segredo = response.json()
+                    data = segredo.get("token")
+                    print(data)
+
+                    segredo = segredo.get("key")
+                    print(segredo)
+                    # segredo = cifra(segredo)
+                    # Descriptografe o token usando a mesma chave secreta
+                    dados = jwt.decode(data, segredo, algorithms=['HS256'])
+                    print(dados)
+                    """
+                    # Enviando a solicitação POST
+                    response = requests.post(api_url, headers=headers, json=data_json)"""
+
+                    # Verificando a resposta
+                    if response.status_code == 200:
+                        dados_json = dados.get('data')
+                        print('Solicitação POST bem-sucedida')
+                        print('Resposta da API:', dados_json)
+                    else:
+                        print('Falha na solicitação POST')
+                        print('Código de status:', dados.status_code)
+                        print('Resposta da API:', dados.text)
+                except Exception as e:
+                    print(f"Erro: {e}")
 
             
         
@@ -101,9 +147,10 @@ def log_request(request, response):
         with open("log.txt", "a") as log_file:
             current_time = datetime.datetime.now().strftime('%d-%m-%Y %H:%M:%S')
             ip_address = request.remote_addr
+            rota = request.path
             request_content = request.data.decode('utf-8')
             response_content = response.get_data(as_text=True)
-            log_entry = f"{current_time} - IP: {ip_address}\nRequest Content:\n{request_content}\nResponse Content:\n{response_content}\n\n"
+            log_entry = f"{current_time} - IP: {ip_address}\nRoute:{rota}\nRequest Content:\n{request_content}\nResponse Content:\n{response_content}\n\n"
             log_file.write(log_entry)
     except Exception as e:
         # Em caso de erro ao registrar o log, você pode optar por fazer algum tratamento específico ou simplesmente ignorá-lo.

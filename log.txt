@@ -484,3 +484,29 @@ Response Content:
 }
 
 
+01-12-2023 14:46:54 - IP: 192.168.23.205
+Route:/novo_contato
+Request Content:
+{"nome": "teste", "numero": "teste", "codClient": "teste"}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente adicionado com sucesso",
+    "exp": "Sat, 02 Dec 2023 17:46:54 GMT"
+  }
+}
+
+
+01-12-2023 14:49:14 - IP: 192.168.23.205
+Route:/novo_contato
+Request Content:
+{"nome": "Felipe", "numero": "5551992090470", "codClient": "teste2"}
+Response Content:
+{
+  "Payload": {
+    "data": "Cliente adicionado com sucesso",
+    "exp": "Sat, 02 Dec 2023 17:49:14 GMT"
+  }
+}
+
+

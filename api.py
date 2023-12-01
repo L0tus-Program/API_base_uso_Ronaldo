@@ -20,8 +20,9 @@ with open('src.json', 'r') as file:
 # key API
 API_KEY = str(src['key'])
 
-# Sua chave secreta para assinar tokens JWT
+# Sua chave secreta para assinar tokens JWT e token do user
 SECRET_KEY = secrets.token_urlsafe(32)
+TOKEN_SECTION = secrets.token_urlsafe(32)
 
 
 # Outras configurações do aplicativo
@@ -86,6 +87,10 @@ def log_responses(response):
 @app.before_request
 def before():
     print("teste before")
+    if not authenticate():
+            log_request(request, jsonify(
+                {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+            return abort(401)
 
 
 @app.after_request
@@ -122,12 +127,6 @@ def get_codigos_return():
 
 @app.route('/query', methods=['POST'])
 def recebe_query():
-    print("Mensagem de debug", file=sys.stdout)
-    print("Mensagem de erro", file=sys.stderr)
-    if not authenticate():
-        log_request(request, jsonify(
-            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-        return abort(401)
     try:
         # Obtenha a consulta SQL do corpo da solicitação (POST)
         query = request.get_data(as_text=True)
@@ -167,11 +166,6 @@ def recebe_query():
 @app.route('/download_ativos', methods=['GET'])
 def ativos():
     try:
-        if not authenticate():
-            log_request(request, jsonify(
-                {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-            return abort(401)
-
         # Envia o arquivo log.txt para download
 
         return send_file('relatorio.csv', as_attachment=True)
@@ -184,10 +178,6 @@ def ativos():
 @app.route('/all_log', methods=['GET'])
 def enviar_log():
     try:
-        if not authenticate():
-            log_request(request, jsonify(
-                {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-            return abort(401)
 
         # Envia o arquivo log.txt para download
         return send_file('log.txt', as_attachment=True)
@@ -200,10 +190,6 @@ def enviar_log():
 @app.route('/backup', methods=['GET'])
 def backup():
     try:
-        if not authenticate():
-            log_request(request, jsonify(
-                {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-            return abort(401)
 
         # Envia o arquivo log.txt para download
         return send_file('openaai.db', as_attachment=True)
@@ -215,11 +201,6 @@ def backup():
 # Função enviar todo o banco de dados
 @app.route('/all_db', methods=['GET'])
 def enviar_db():
-    if not authenticate():
-        log_request(request, jsonify(
-            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-        return abort(401)
-
     try:
         # Conecte-se ao banco de dados SQLite
         conn = sqlite3.connect('openaai.db')
@@ -263,10 +244,6 @@ def enviar_db():
 # Função criar
 @app.route('/create_db', methods=['POST'])
 def criar_db():
-    if not authenticate():
-        log_request(request, jsonify(
-            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-        return abort(401)
     try:
         db.criar_db_sqlite()
         db.criar_login()
@@ -290,10 +267,6 @@ def criar_db():
 @app.route('/novo_contato', methods=['POST'])
 def novo_contato():
     global SECRET_KEY
-    if not authenticate():
-        log_request(request, jsonify(
-            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-        return abort(401)
     try:
 
         # Recebe os dados JSON da solicitação POST
@@ -367,10 +340,6 @@ def envia_lista_espera():
 # Consulta pelo codClient
 @app.route('/consultar_cliente/<int:cliente_id>', methods=['GET'])
 def consulta(cliente_id):
-    if not authenticate():
-        log_request(request, jsonify(
-            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-        return abort(401)
     try:
         conn = sqlite3.connect('openaai.db')
         cursor = conn.cursor()
@@ -406,10 +375,6 @@ def consulta(cliente_id):
 # Remover pelo codigo xp
 @app.route('/remove_registro', methods=['POST'])
 def remove_registro():
-    if not authenticate():
-        log_request(request, jsonify(
-            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-        return abort(401)
     try:
         dados = request.get_data(as_text=True)
        # print(f'Remover = {dados}\nTipo de dado = {type(dados)}')
@@ -439,10 +404,6 @@ def remove_registro():
 # Remover pelo telefone
 @app.route('/remove_telefone', methods=['POST'])
 def remove_telefone():
-    if not authenticate():
-        log_request(request, jsonify(
-            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-        return abort(401)
     try:
 
         dados = request.get_data(as_text=True)
@@ -473,10 +434,6 @@ def remove_telefone():
 # Update pelo ID
 @app.route('/update', methods=['POST'])
 def update_id():
-    if not authenticate():
-        log_request(request, jsonify(
-            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-        return abort(401)
     try:
         dados = request.get_data(as_text=True)
         print(f'Remover = {dados}\nTipo de dado = {type(dados)}')
@@ -506,10 +463,6 @@ def update_id():
 # Update confirma envio = Nao
 @app.route('/confirma_envio', methods=['POST'])
 def confirma_envio():
-    if not authenticate():
-        log_request(request, jsonify(
-            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-        return abort(401)
     try:
         conn = sqlite3.connect('openaai.db')
         cursor = conn.cursor()
@@ -536,10 +489,6 @@ def confirma_envio():
 # Deleta TODOS os clientes
 @app.route('/delete_clientes', methods=['POST'])
 def delete_clientes():
-    if not authenticate():
-        log_request(request, jsonify(
-            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-        return abort(401)
     try:
         conn = sqlite3.connect('openaai.db')
         cursor = conn.cursor()
@@ -566,11 +515,6 @@ def delete_clientes():
 # Contar todos os clientes
 @app.route('/contar_clientes', methods=['GET'])
 def contar_clientes():
-    if not authenticate():
-        log_request(request, jsonify(
-            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-
-        return abort(401)
     try:
         # Conecte-se ao banco de dados SQLite
         conn = sqlite3.connect('openaai.db')
@@ -600,10 +544,6 @@ def contar_clientes():
 # Retornar primeiro cliente com ConfirmaEnvio = não
 @app.route('/confirmaEqualNao', methods=['GET'])
 def confirmaEqualNao():
-    if not authenticate():
-        log_request(request, jsonify(
-            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-        return abort(401)
     try:
         # Conecte-se ao banco de dados SQLite
         conn = sqlite3.connect('openaai.db')
@@ -648,10 +588,6 @@ def confirmaEqualNao():
 
 @app.route('/enviar_false', methods=['GET'])
 def enviar_false():
-    if not authenticate():
-        log_request(request, jsonify(
-            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-        return abort(401)
     try:
         # Conecte-se ao banco de dados SQLite
         conn = sqlite3.connect('openaai.db')
@@ -695,10 +631,6 @@ def enviar_false():
 # Retronar todos os clientes com ENVIAR igual a 1
 @app.route('/enviar_true', methods=['GET'])
 def enviar_true():
-    if not authenticate():
-        log_request(request, jsonify(
-            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-        return abort(401)
     try:
         # Conecte-se ao banco de dados SQLite
         conn = sqlite3.connect('openaai.db')
@@ -742,11 +674,6 @@ def enviar_true():
 # Cria um novo user
 @app.route('/new_user', methods=['POST'])
 def new_user():
-
-    if not authenticate():
-        log_request(request, jsonify(
-            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-        return abort(401)
     try:
         # Recebe os dados JSON da solicitação POST
         dados = request.get_json()
@@ -785,40 +712,51 @@ def new_user():
         return jsonify({'error': str(e)}), 400
 
 
-# Consulta USER pelo e-mail
-@app.rout('/consulta_user/<int:email>', methods=['GET'])
-def consulta_user(email):
-    if not authenticate():
-        log_request(request, jsonify(
-            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-        return abort(401)
+# Consulta USER pelo e-mail e valida se o token está batendo com o bd e também retorna perfil
+@app.route('/consulta_user/', methods=['GET'])
+def consulta_user():
     try:
+        data = request.get_json()
         conn = sqlite3.connect('openaai.db')
         cursor = conn.cursor()
-        # Corrigindo a consulta SQL para selecionar o cliente com base no ID
-        query = "SELECT * FROM users WHERE email = ?"
 
-        # Execute a consulta SQL
+        email = data['email']
+        token_client = data['token']
+          
+        query = "SELECT perfil, token FROM users WHERE email = ?"
         cursor.execute(query, (email,))
-
-        # Obtenha os resultados da consulta
         user = cursor.fetchone()
 
         conn.close()
 
         if user is None:
             return jsonify({'message': 'Usuario não encontrado'}), 404
+        
 
-        payload = {
-            'data': "Usuario consultado com sucesso",
-            'resultado': user,
-            # tempo de expiração do token
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
-        }
-        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        perfil = user[0]
+        token_db = user[1]
 
-        log_request(request, jsonify({'Payload': payload}))
-        return jsonify({"key": SECRET_KEY, "token": token, "cliente": user}), 200
+        if token_db == token_client:
+            payload = {
+                'data' : "Usuario autenticado",
+                'perfil': perfil,
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
+            }
+            token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+                
+            log_request(request, jsonify({'Payload': payload}))
+            return jsonify({"key": SECRET_KEY, "token": token, "cliente": user}), 200
+        
+        else:
+            payload = {
+                'data' : "Erro na autenticacao",
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
+            }
+            token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+            log_request(request, jsonify({'Payload': payload}))
+            return jsonify({"key": SECRET_KEY, "token": token, "cliente": user}), 201
+
+
     except Exception as e:
         # Em caso de erro, retorna uma resposta de erro
         return jsonify({'error': str(e)}), 400
@@ -827,10 +765,6 @@ def consulta_user(email):
 # Remover usuário pelo email
 @app.route('/delete_user', methods=['POST'])
 def delete_user():
-    if not authenticate():
-        log_request(request, jsonify(
-            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-        return abort(401)
     try:
         dados = request.get_data(as_text=True)
        # print(f'Remover = {dados}\nTipo de dado = {type(dados)}')
@@ -860,10 +794,6 @@ def delete_user():
 # Alterar senha do usuário pelo email
 @app.route('/update_password', methods=['POST'])
 def update_password():
-    if not authenticate():
-        log_request(request, jsonify(
-            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-        return abort(401)
     try:
         # Recebe o email e a nova senha do usuário a ser atualizada no corpo da solicitação POST
         data = request.get_json()
@@ -899,10 +829,6 @@ def update_password():
 # Alterar enviar para 0
 @app.route('/desabilita_cliente', methods=['POST'])
 def desabilita():
-    if not authenticate():
-        log_request(request, jsonify(
-            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-        return abort(401)
     try:
         # Recebe o email e a nova senha do usuário a ser atualizada no corpo da solicitação POST
         data = request.get_json()
@@ -950,10 +876,6 @@ def desabilita():
 # Alterar enviar para 1
 @app.route('/habilita_cliente', methods=['POST'])
 def habilita():
-    if not authenticate():
-        log_request(request, jsonify(
-            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-        return abort(401)
     try:
         # Recebe o email e a nova senha do usuário a ser atualizada no corpo da solicitação POST
         data = request.get_json()
@@ -1001,10 +923,6 @@ def habilita():
 # Alterar token do usuário
 @app.route('/update_token', methods=['POST'])
 def update_token():
-    if not authenticate():
-        log_request(request, jsonify(
-            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-        return abort(401)
     try:
         # Recebe o email e o novo token do usuário a ser atualizado no corpo da solicitação POST
         data = request.get_json()
@@ -1060,10 +978,6 @@ def serve_static_css(filename):
 
 @app.route('/status', methods=['GET'])
 def enviar_status():
-    if not authenticate():
-        log_request(request, jsonify(
-            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
-        return abort(401)
     try:
         payload = {
             'data': "API online.", "GPT": "Status - OK",
@@ -1083,8 +997,6 @@ def enviar_status():
 
 @app.route("/verificar_numero", methods=["POST"])
 def verificar_numero():
-    if not authenticate():
-        return abort(401)
     try:
         # Obter os dados JSON enviados na solicitação
         data = request.get_json()
@@ -1133,17 +1045,22 @@ def verificar_numero():
 # Verificar credenciais de users para api whats
 @app.route("/verificar_credenciais", methods=["POST"])
 def verificar_credenciais():
-    if not authenticate():
-        return abort(401)
     try:
         # Obter os dados JSON enviados na solicitação
         data = request.get_json()
         email = data.get("email")
         senha = data.get("senha")
 
+        copy_token = TOKEN_SECTION
+
         # Conecte-se ao banco de dados SQLite
         conn = sqlite3.connect("openaai.db")
         cursor = conn.cursor()
+        # Update de token do usuario
+        query_token = "UPDATE users SET token = ? WHERE email = ?"
+        conn.execute(query_token, (copy_token, email))
+
+        conn.commit()
 
         # Execute uma consulta para verificar as credenciais (substitua com sua própria consulta)
         cursor.execute(
@@ -1151,7 +1068,7 @@ def verificar_credenciais():
                                                                    senha)
         )
         usuario = cursor.fetchone()
-
+        
         # Feche a conexão com o banco de dados
         conn.close()
 
@@ -1186,8 +1103,6 @@ def verificar_credenciais():
 
 @app.route("/verificar_credenciais_dash", methods=["POST"])
 def verificar_credenciais_dash():
-    if not authenticate():
-        return abort(401)
     try:
         print("Entrou try dash", file=sys.stderr)
         # Obter os dados JSON enviados na solicitação
