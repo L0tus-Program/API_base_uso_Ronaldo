@@ -713,8 +713,12 @@ def new_user():
 
 
 # Consulta USER pelo e-mail e valida se o token está batendo com o bd e também retorna perfil
-@app.route('/consulta_user/', methods=['GET'])
+@app.route('/consulta_user', methods=['POST'])
 def consulta_user():
+    if not authenticate():
+        log_request(request, jsonify(
+            {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
+        return abort(401)
     try:
         data = request.get_json()
         conn = sqlite3.connect('openaai.db')
@@ -755,6 +759,11 @@ def consulta_user():
             token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
             log_request(request, jsonify({'Payload': payload}))
             return jsonify({"key": SECRET_KEY, "token": token, "cliente": user}), 201
+
+
+    except Exception as e:
+        # Em caso de erro, retorna uma resposta de erro
+        return jsonify({'error': str(e)}), 400
 
 
     except Exception as e:
