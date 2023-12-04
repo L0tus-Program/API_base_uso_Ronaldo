@@ -7,9 +7,7 @@ import datetime
 import secrets
 import jwt
 import sys
-from utils import log_request, send_whats, export_to_csv
-# import threading
-# from utils import teste
+from utils import log_request, send_whats
 
 
 # Abra o arquivo JSON
@@ -25,23 +23,17 @@ SECRET_KEY = secrets.token_urlsafe(32)
 TOKEN_SECTION = secrets.token_urlsafe(32)
 
 
-# Outras configurações do aplicativo
-DEBUG = True
-ENV = 'development'
-HOST = 'localhost'
-PORT = 5000
+
 
 # Criando aplicação
 app = Flask(__name__, static_folder='static', template_folder='templates')
 CORS(app)  # Quando subir pra VPS, configurar domínios que podem acessar
 
-# Autenticação
+# Autenticação 
 
 
 def authenticate():
-    print("Mensagem de autenticacao", file=sys.stdout)
     api_key = request.headers.get('X-API-KEY')
-    print(api_key)
     if api_key != API_KEY:
 
         return abort(401)
@@ -52,8 +44,6 @@ def authenticate():
 
 def validar_cliente(codClient):
     try:
-        print("Entrou validar cliente")
-        print("Entrou validar cliente", file=sys.stderr)
         # Conecta-se ao banco de dados
         conn = sqlite3.connect('openaai.db')
         cursor = conn.cursor()
@@ -86,7 +76,6 @@ def log_responses(response):
 
 @app.before_request
 def before():
-    print("teste before")
     if not authenticate():
             log_request(request, jsonify(
                 {'message': 'REQUISIÇÃO NÃO AUTENTICADA!'}))
@@ -95,16 +84,9 @@ def before():
 
 @app.after_request
 def after_request(response):
-    """if request.path == '/novo_contato':
-        last = last_client()
-        if last:
-            nome, numero = last
-            # Iniciar a função em uma thread
-            t = threading.Thread(target=send_whats(nome,numero))
-            t.start()"""
-
-    # Ações específicas para a rota '/novo_contato' aqui
-
+    #Envia o response criptografado
+    #log_request(request,response)
+    #log_request(request, jsonify({'Payload': payload}))
     return log_responses(response)
 
 # Rota para retornar a tabela codigos_return como JSON
@@ -131,8 +113,6 @@ def recebe_query():
         # Obtenha a consulta SQL do corpo da solicitação (POST)
         query = request.get_data(as_text=True)
 
-        print(f'Query = {query}', file=sys.stderr)
-
         # Conecte-se ao banco de dados SQLite
         conn = sqlite3.connect('openaai.db')
         cursor = conn.cursor()
@@ -153,7 +133,6 @@ def recebe_query():
         conn.close()
 
         # Envie os dados como resposta em formato JSON
-        print(results)
         log_request(request, jsonify(
             {'message': results}))
         return jsonify(results), 200
@@ -233,7 +212,7 @@ def enviar_db():
         }
         log_request(request, jsonify({'Payload': payload}))
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-        # return jsonify({"mensagem": "Contagem de registros", "contador": contador}), 200
+
 
         return jsonify({"mensagem": "Dados do banco de dados", "key": SECRET_KEY, "token": token}), 200
 
@@ -969,14 +948,11 @@ def index():
     return render_template('index.html')
 
 # Rota para servir os arquivos estáticos do React
-
-
 @app.route('/static/js/<path:filename>')
 def serve_static_js(filename):
     return send_from_directory('static/js', filename)
 
 # Rota para servir os arquivos CSS
-
 
 @app.route('/static/css/<path:filename>')
 def serve_static_css(filename):
@@ -984,7 +960,6 @@ def serve_static_css(filename):
 
 
 # Conferir API online
-
 @app.route('/status', methods=['GET'])
 def enviar_status():
     try:
@@ -1054,6 +1029,8 @@ def verificar_numero():
 # Verificar credenciais de users para api whats
 @app.route("/verificar_credenciais", methods=["POST"])
 def verificar_credenciais():
+    if not authenticate():
+        return abort(401)
     try:
         # Obter os dados JSON enviados na solicitação
         data = request.get_json()
@@ -1066,11 +1043,14 @@ def verificar_credenciais():
         conn = sqlite3.connect("openaai.db")
         cursor = conn.cursor()
         # Update de token do usuario
-        query_token = "UPDATE users SET token = ? WHERE email = ?"
-        conn.execute(query_token, (copy_token, email))
+        try:
 
-        conn.commit()
+            query_token = "UPDATE users SET token = ? WHERE email = ? AND senha = ?"
+            conn.execute(query_token, (copy_token, email,senha))
 
+            conn.commit()
+        except Exception as e:
+            print(e)
         # Execute uma consulta para verificar as credenciais (substitua com sua própria consulta)
         cursor.execute(
             "SELECT * FROM users WHERE email = ? AND senha = ? ", (email,
@@ -1097,7 +1077,7 @@ def verificar_credenciais():
 
             return jsonify({"key": SECRET_KEY, "mensagem": "Credenciais corretas", "token": token}), 200
         else:
-            log_request(request, jsonify({'Payload': payload}))
+            log_request(request, jsonify({'Message': "Credenciais incorretas"}))
             return jsonify({"mensagem": "Credenciais incorretas"}), 401
 
     except Exception as e:
@@ -1163,3 +1143,4 @@ def verificar_credenciais_dash():
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
+

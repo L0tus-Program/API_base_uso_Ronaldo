@@ -151,7 +151,7 @@ def lista_espera():
 
 
 
-
+"""
 criar_db_sqlite()
 
 criar_login()
@@ -165,4 +165,4 @@ popular_dash()
 
 popular_codigos_return()
 
-lista_espera()
+lista_espera()"""

@@ -63,30 +63,39 @@ A API estará disponível em http://localhost:5000. OU outro ip/porta que você 
 
 # Endpoints
 
-/codigos_return (GET): Retorna a tabela codigos_return como JSON, possivelmente para análise de status de respostas.
-
+- /codigos_return (GET): Retorna a tabela codigos_return como JSON.
 - /query (POST): Recebe e executa uma consulta SQL personalizada.
-- /all_log (GET): Envia todo o log registrado, provavelmente como um arquivo para download.
-- /backup (GET): Envia um backup do banco de dados, presumivelmente para fins de recuperação ou análise.
-- /all_db (GET): Retorna todos os dados do banco de dados, semelhante ao endpoint anterior.
+- /download_ativos (GET): Permite o download de um arquivo de ativos (relatório CSV).
+- /all_log (GET): Envia o arquivo log.txt como um download.
+- /backup (GET): Envia um backup do banco de dados (openaai.db) como um download.
+- /all_db (GET): Retorna todos os dados do banco de dados.
 - /create_db (POST): Cria o banco de dados e suas tabelas.
 - /novo_contato (POST): Adiciona um novo cliente ao banco de dados.
+- /lista_espera (POST): Envia mensagens para clientes na lista de espera.
 - /consultar_cliente/int:cliente_id (GET): Consulta informações de um cliente pelo seu ID.
 - /remove_registro (POST): Remove um registro de cliente pelo ID.
 - /remove_telefone (POST): Remove um registro de cliente pelo número de telefone.
-- /update (POST): Atualiza informações do cliente pelo ID.
+- /update (POST): Atualiza informações de um cliente pelo ID.
 - /confirma_envio (POST): Atualiza registros de clientes para indicar a confirmação de envio.
 - /delete_clientes (POST): Deleta todos os registros de clientes.
 - /contar_clientes (GET): Retorna a contagem total de clientes.
 - /confirmaEqualNao (GET): Retorna o primeiro cliente com ConfirmaEnvio igual a "não".
-- /enviar_false (GET) e /enviar_true (GET): Retornam clientes com o campo enviar configurado como 0 ou 1, respectivamente.
+- /enviar_false (GET): Retorna clientes com o campo enviar configurado como 0.
+- /enviar_true (GET): Retorna clientes com o campo enviar configurado como 1.
 - /new_user (POST): Cria um novo usuário.
+- /consulta_user (POST): Consulta informações de um usuário pelo email e valida o token.
 - /delete_user (POST): Remove um usuário pelo email.
 - /update_password (POST): Atualiza a senha de um usuário pelo email.
 - /update_token (POST): Atualiza o token de um usuário pelo email.
-- /desabilita_cliente (POST) e /habilita_cliente (POST): Alteram o status de envio de um cliente para 0 ou 1.
+- /desabilita_cliente (POST): Altera o status de envio de um cliente para 0.
+- /habilita_cliente (POST): Altera o status de envio de um cliente para 1.
+- /verificar_numero (POST): Valida as credenciais de clientes com base no número de telefone.
+- /verificar_credenciais (POST): Valida as credenciais de usuários para a API do WhatsApp.
+- /verificar_credenciais_dash (POST): Valida as credenciais para o painel de controle.
 - /status (GET): Verifica o status da API, indicando se está online.
-- /verificar_numero (POST), /verificar_credenciais (POST), /verificar_credenciais_dash (POST): Validam as credenciais de clientes ou usuários, cada um para um propósito específico (número de telefone, usuários da API do WhatsApp, e painel de controle, respectivamente).
+- / (GET): Rota principal para a renderização da página inicial.
+- /static/js/path:filename (GET): Serve arquivos JavaScript estáticos.
+- /static/css/path:filename (GET): Serve arquivos CSS estáticos.
   
 ## Contribuindo
 
