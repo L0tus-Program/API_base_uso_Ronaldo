@@ -9,7 +9,6 @@ import jwt
 import sys
 from utils import log_request, send_whats
 
-
 # Abra o arquivo JSON
 with open('src.json', 'r') as file:
     src = json.load(file)
@@ -197,8 +196,8 @@ def enviar_db():
                 "nome": row[1],
                 "numero": row[2],
                 "codClient": row[3],
-                "ConfirmouWP": row[4],
-                "ConfirmaEnvio": row[5],
+                "ConfirmaEnvio": row[4],
+                "Enviar": row[5],
 
                 # Adicione mais colunas conforme necessário
             })
@@ -414,14 +413,14 @@ def remove_telefone():
 @app.route('/update', methods=['POST'])
 def update_id():
     try:
-        dados = request.get_data(as_text=True)
+        dados = request.get_json()
         print(f'Remover = {dados}\nTipo de dado = {type(dados)}')
         conn = sqlite3.connect('openaai.db')
         cursor = conn.cursor()
-        query = "UPDATE clientes SET nome = ?, numero = ?, ConfirmaEnvio = ? WHERE codClient = ?"
+        query = "UPDATE clientes SET nome = ?, numero = ? WHERE codClient = ?"
         # Execute a consulta SQL
         cursor.execute(query, (dados['nome'], dados['numero'],
-                               dados['ConfirmaEnvio']))
+                            dados['codCliente']))
         conn.commit()
         conn.close()
         payload = {

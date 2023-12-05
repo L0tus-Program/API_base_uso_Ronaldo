@@ -121,9 +121,8 @@ Sinta-se à vontade para contribuir para este projeto. Você pode abrir problema
 
 
 - Endpoint verificar_numero esta sem JWT
-
+- Revisar rota UPDATE
 
 # Alteração a alinhar
 
-- Adicionei ao endpoint /verificar_credenciais o registro de token aleatório na tabela users, ele já era retornado no payload
-- O token aleatório só é registrado no /verificar_credenciais. O endpoint /consulta_user retorna todos os dados através do e-mail
+- Criar documentação web dentro do template da API

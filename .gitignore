@@ -10,3 +10,4 @@ openaai.db
 /node_modules
 testes/node_modules
 log.txt
+./log.txt
