@@ -7,7 +7,7 @@ import datetime
 import secrets
 import jwt
 import sys
-from utils import log_request, send_whats
+from utils import *
 
 # Abra o arquivo JSON
 with open('src.json', 'r') as file:
@@ -877,7 +877,7 @@ def habilita():
             log_request(request, jsonify({'Payload': payload}))
             token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 
-            return jsonify({"key": SECRET_KEY, "token": token, }), 200
+            return jsonify({"key": SECRET_KEY, "token": token, }), 201
 
         # Conecta-se ao banco de dados
         conn = sqlite3.connect('openaai.db')
@@ -1067,6 +1067,7 @@ def verificar_credenciais():
                 "usuario": usuario[0],
                 "email": email,
                 "token": usuario[4],
+                "perfil": usuario[2],
                 # tempo de expiração do token
                 "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1)
             }
@@ -1138,6 +1139,36 @@ def verificar_credenciais_dash():
                 {"erro": "Erro ao verificar as credenciais", "mensagem": str(e)}),
             500,
         )
+
+
+
+# Pegar clientes com enviar true e fazer um FOR pra API da Evolution
+@app.route("/send_evolution", methods=["POST"])
+def send_evolution():
+    try:
+        conn = sqlite3.connect('openaai.db')
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM clientes WHERE enviar = 1')
+        rows = cursor.fetchall()
+        conn.close()
+        # Criar um dicionário com os resultados
+        data = [{"nome": row[1],'numero': row[2]} for row in rows]
+
+        for contato in data:
+            message_from_front(contato['numero'],instancia='ronaldo',message='teste safado')
+            print("Nome:",contato['nome'],"Numero:",contato['numero'])
+
+
+
+
+        return jsonify(data),200
+
+       
+       
+
+        
+    except Exception as e:
+        return jsonify({"message":"Erro na requisição","erro":str(e)}),400
 
 
 if __name__ == '__main__':

@@ -225,3 +225,102 @@ def export_to_csv():
     finally:
         if conn:
             conn.close()
+
+
+
+def message_from_front(numero,message,instancia):
+    try:
+
+        url = f'https://api.conexaoia.digital/message/sendText/{instancia}'
+
+        #message = f'Olá {nome}. Sou o Ronaldo e trabalho como especialista em renda variável. Estou aqui para oferecer sugestões e orientações sobre investimentos nessa área.'
+
+        payload = json.dumps({
+            "number": numero,
+            "options": {
+                "delay": 1200,
+                "presence": "composing",
+                "linkPreview": False
+            },
+            "textMessage": {
+                "text": message
+            }
+        })
+        headers = {
+            'Content-Type': 'application/json',
+            'apikey': 'B6D711FCDE4D4FD5936544120E713976'
+        }
+
+        response = requests.request("POST", url, headers=headers, data=payload)
+
+        print(response.text)
+        print(response.status_code)
+
+
+
+
+    except Exception as e:
+        pass
+
+
+
+def deslogar_evolution(instancia):
+    try:
+        url = f'https://api.conexaoia.digital/instance/logout/{instancia}'
+    
+        payload = {}
+        headers = {
+        'apikey': 'B6D711FCDE4D4FD5936544120E713976'
+        }
+        
+        response = requests.request("DELETE", url, headers=headers, data=payload)
+        
+        print(response.text)
+        
+    except Exception as e:
+        return "erro deslogar"
+
+
+
+def deletar_instancia(instancia):
+    try:
+
+        
+        url = f'https://api.conexaoia.digital/instance/delete/{instancia}'
+        
+        payload = {}
+        headers = {
+        'apikey': 'B6D711FCDE4D4FD5936544120E713976'
+        }
+        
+        response = requests.request("DELETE", url, headers=headers, data=payload)
+        
+        print(response.text)
+
+    except Exception as e:
+        return "erro deletar"
+
+
+
+def criar_instancia(instancia):
+    try:
+
+        
+        url = "https://api.conexaoia.digital/instance/create"
+ 
+        payload = json.dumps({
+        "instanceName": instancia,
+        "token": "B6D711FCsDE4D4FD5936544120Es713976",
+        "qrcode": True
+        })
+        headers = {
+        'Content-Type': 'application/json',
+        'apikey': 'B6D711FCDE4D4FD5936544120E713976'
+        }
+        
+        response = requests.request("POST", url, headers=headers, data=payload)
+        
+        print(response.text)
+
+    except Exception as e:
+        return "erro criar"
